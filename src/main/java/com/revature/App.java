@@ -11,10 +11,10 @@ import java.util.Scanner;
 
 public class App {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
-		Main startApp = new Main();
+		App startApp = new App();
 		//Keeps the program running 
 		while(1==1) {
 			//Prompts the user the options available for this program
@@ -43,7 +43,7 @@ public class App {
 		}
 	}
 	
-	public void login(Main obj) throws IOException{
+	public void login(App obj) throws IOException{
 		Scanner input = new Scanner(System.in);
 //		System.out.println("\n");
 		System.out.println("=====================");
@@ -64,7 +64,7 @@ public class App {
 		
 	}
 	
-	public void createAccount(Main obj) throws IOException{
+	public void createAccount(App obj) throws IOException{
 		Scanner input = new Scanner(System.in);
 		System.out.println("=====================");
 		System.out.println("Please enter your information for account creation when promped...");
@@ -106,8 +106,5 @@ public class App {
 		}
 		return userExists;
 	}
-	
-	
-	
 	
 }
