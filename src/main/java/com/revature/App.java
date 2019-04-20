@@ -13,10 +13,10 @@ public class App {
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		
+		boolean run = true;
 		App startApp = new App();
 		//Keeps the program running 
-		while(1==1) {
+		while(run) {
 			//Prompts the user the options available for this program
 			System.out.print("Press 1 to login... \nPress 2 to create a new account... \n");
 			//Scanner class for input as 
@@ -40,6 +40,8 @@ public class App {
 					}
 				}
 			}
+			System.out.println("Terminating loop");
+			run = false;
 			input.close();
 		}
 	}
@@ -67,22 +69,27 @@ public class App {
 	
 	public void succLogin(App obj) {
 		Scanner input = new Scanner(System.in);
-		System.out.println("Press 1 to create a new bank accoount.");
-		System.out.println("Press 2 to see current bank accoounts.");
+		System.out.println("Press 1 to create a new bank account.");
+		System.out.println("Press 2 to see current bank accounts.");
 		System.out.print("Please pick option: ");
 		int option = input.nextInt();
 		if(option == 1) {
 			System.out.println("What kind of account?");
-			System.out.println("Press 1 to create a new Checkings accoount.");
-			System.out.println("Press 2 to create a new Joint accoount.");
+			System.out.println("Press 1 to create a new Checkings account.");
+			System.out.println("Press 2 to create a new Joint account.");
+			System.out.print("Please pick an option: ");
 			option = input.nextInt();
 			if(option == 1) {
 				System.out.println("Pressed 1 New Checkings Account.");
+				CheckingAccount checkAcc = new CheckingAccount();
+				checkAcc.checkBalance();
+				obj.singleAccountOptions(obj, checkAcc);
 			}else if(option == 2) {
 				System.out.println("Pressed 2 New Savings Account.");
+				
 			}
 		}else if(option == 2) {
-			
+			System.out.println("Pressed 2 These are your accounts.");
 		}
 	}
 	
@@ -106,6 +113,34 @@ public class App {
 		obj.login(obj);
 	}
 	
+	
+	
+	public void singleAccountOptions(App obj, CheckingAccount account) {
+		int amount;
+		Scanner option = new Scanner(System.in);
+		System.out.println("What would you like to do?");
+		System.out.println("Press 1 to deposit money.");
+		System.out.println("Press 2 to withdaw money.");
+		System.out.println("Press 3 to transfer money between accoutns?.");
+		int select = option.nextInt();
+		switch(select) {
+			case 1:
+				System.out.println("How much would you like to add in?");
+				System.out.print("$");
+				amount = option.nextInt();
+				account.Deposit(amount);
+				break;
+			case 2:
+				System.out.println("How much would you like to take out?");
+				System.out.print("$");
+				amount = option.nextInt();
+				account.Withdraw(amount);
+				break;
+				
+		}
+		
+				
+	}
 	
 	
 	

@@ -1,5 +1,5 @@
 package com.revature;
 
-abstract class bankAccount {
+abstract class BankAccount {
 	public abstract void checkBalance();
 }
