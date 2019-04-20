@@ -40,6 +40,7 @@ public class App {
 					}
 				}
 			}
+			input.close();
 		}
 	}
 	
@@ -58,10 +59,31 @@ public class App {
 		boolean exists = obj.authLogin(username, password);
 		if(exists) {
 			System.out.println("USER LOGIN WAS A SUCCESS!");
+			obj.succLogin(obj);
 		}else {
 			System.out.println("COULD NOT VERIFY PLEASE START OVER!");
 		}
-		
+	}
+	
+	public void succLogin(App obj) {
+		Scanner input = new Scanner(System.in);
+		System.out.println("Press 1 to create a new bank accoount.");
+		System.out.println("Press 2 to see current bank accoounts.");
+		System.out.print("Please pick option: ");
+		int option = input.nextInt();
+		if(option == 1) {
+			System.out.println("What kind of account?");
+			System.out.println("Press 1 to create a new Checkings accoount.");
+			System.out.println("Press 2 to create a new Joint accoount.");
+			option = input.nextInt();
+			if(option == 1) {
+				System.out.println("Pressed 1 New Checkings Account.");
+			}else if(option == 2) {
+				System.out.println("Pressed 2 New Savings Account.");
+			}
+		}else if(option == 2) {
+			
+		}
 	}
 	
 	public void createAccount(App obj) throws IOException{
@@ -81,7 +103,9 @@ public class App {
 		}
 		System.out.print("Account created successfully!");
 		System.out.print("Please Try Logging In.....");
+		obj.login(obj);
 	}
+	
 	
 	
 	
