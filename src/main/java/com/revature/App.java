@@ -10,11 +10,16 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class App {
-
+	public int bankAccountLines;
+	
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub		
+		
+		
+		int accountsLine = 0;
 		boolean run = true;
 		App startApp = new App();
+		
 		//Keeps the program running 
 		while(run) {
 			//Prompts the user the options available for this program
@@ -121,7 +126,7 @@ public class App {
 		System.out.println("What would you like to do?");
 		System.out.println("Press 1 to deposit money.");
 		System.out.println("Press 2 to withdaw money.");
-		System.out.println("Press 3 to transfer money between accoutns?.");
+		System.out.println("Press 3 to transfer money between accounts?.");
 		int select = option.nextInt();
 		switch(select) {
 			case 1:
@@ -165,5 +170,37 @@ public class App {
 		}
 		return userExists;
 	}
+	
+	//Uneeded Getters and Setter for Thread Problem	
+//	public void incrementCount(int num) {
+//		this.bankAccountLines = num;
+//	}
+//	
+//	public int retBankAcountLineCount() {
+//		return this.bankAccountLines;
+//	}
+	
+	
+	
+	
+	//Trying to make a new Thread to count the lines for parallel processing
+//	class lineReaderThread implements Runnable{
+//		public int lineCount;
+//		@Override
+//		public void run() {
+//			lineCount  = 0;
+//			try(BufferedReader fileReader = new BufferedReader(new FileReader("textfiles/bankAccounts.txt"));){
+//				synchronized(this) {
+//				while (fileReader.readLine() != null) lineCount++;
+//				notify();
+//				}
+//				fileReader.close();
+//	
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}	
+//	}
 	
 }
