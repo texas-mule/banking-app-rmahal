@@ -7,19 +7,24 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 
 public class App {
-	public int bankAccountLines;
+	//public int bankAccountLines;
 	
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub		
-		
-		
 		int accountsLine = 0;
 		boolean run = true;
 		App startApp = new App();
 		
+		startApp.DBTEST();
 		//Keeps the program running 
 		while(run) {
 			//Prompts the user the options available for this program
@@ -85,13 +90,14 @@ public class App {
 			System.out.print("Please pick an option: ");
 			option = input.nextInt();
 			if(option == 1) {
-				System.out.println("Pressed 1 New Checkings Account.");
+				System.out.println("Applied for new Checkings Account.");
 				CheckingAccount checkAcc = new CheckingAccount();
 				checkAcc.checkBalance();
 				obj.singleAccountOptions(obj, checkAcc);
 			}else if(option == 2) {
-				System.out.println("Pressed 2 New Savings Account.");
-				
+				System.out.println("Applied for new Joint Account.");
+				JointAccount jointAcc = new JointAccount();
+				jointAcc.checkBalance();
 			}
 		}else if(option == 2) {
 			System.out.println("Pressed 2 These are your accounts.");
@@ -118,15 +124,17 @@ public class App {
 		obj.login(obj);
 	}
 	
-	
-	
-	public void singleAccountOptions(App obj, CheckingAccount account) {
+	public <T extends BankAccount> void singleAccountOptions(App obj, T account) {
+		while(1==1) {
 		int amount;
 		Scanner option = new Scanner(System.in);
 		System.out.println("What would you like to do?");
 		System.out.println("Press 1 to deposit money.");
 		System.out.println("Press 2 to withdaw money.");
-		System.out.println("Press 3 to transfer money between accounts?.");
+		System.out.println("Press 3 to transfer money between accounts.");
+		System.out.println("Press 4 to check current Balance.");
+		System.out.println("To go back to the previous menu press 0.");
+		System.out.print("Please pick an option: ");
 		int select = option.nextInt();
 		switch(select) {
 			case 1:
@@ -141,14 +149,23 @@ public class App {
 				amount = option.nextInt();
 				account.Withdraw(amount);
 				break;
-				
+			case 3:
+				System.out.println("How much would you like to take out?");
+				System.out.print("$");
+				amount = option.nextInt();
+				break;
+			case 4:
+				account.checkBalance();
+				break;
+			case 0:
+				obj.succLogin(obj);
+				break;
+			default:
+				System.out.println("Invalid option please try again....");
+				break;			
 		}
-		
-				
+	  }			
 	}
-	
-	
-	
 	
 	public boolean authLogin(String username, String password) throws IOException {
 		BufferedReader bufferedReader;
@@ -170,6 +187,39 @@ public class App {
 		}
 		return userExists;
 	}
+
+	public void DBTEST() {
+		try {
+			Class.forName("org.postgresql.Driver");
+		} catch(java.lang.ClassNotFoundException e) {
+			System.out.print(e.getMessage());
+		}
+		
+		String url  = "jdbc:postgresql://127.0.0.1:8082/postgres";
+		String username = "postgres";
+		String password = "test";
+		try (
+			Connection connection = DriverManager.getConnection(url,username,password);
+			Statement statement = connection.createStatement();
+		) {   // executeUpdate() returns the number of rows affected for DML
+				System.out.println("I work");
+				String sql = "SELECT id, food FROM public.\"foodDB\";";
+				String sqlTwp = "INSERT INTO public.\"foodDB\" id, food) VALUES (?, ?);";
+				Statement stmt = connection.createStatement();
+				PreparedStatement ps = connection.prepareStatement(sqlTwp);
+				ResultSet rs = stmt.executeQuery(sql);
+				System.out.println("DONE WITH DB.");
+				while(rs.next()) {
+					System.out.print(rs.getString(1)+" ");
+					
+					System.out.println(rs.getString(2));
+				}
+				
+			} catch (SQLException ex) {
+				System.out.println("I DO NOT work");
+				System.out.println(ex.getMessage());
+			} 
+	}
 	
 	//Uneeded Getters and Setter for Thread Problem	
 //	public void incrementCount(int num) {
@@ -179,10 +229,7 @@ public class App {
 //	public int retBankAcountLineCount() {
 //		return this.bankAccountLines;
 //	}
-	
-	
-	
-	
+
 	//Trying to make a new Thread to count the lines for parallel processing
 //	class lineReaderThread implements Runnable{
 //		public int lineCount;

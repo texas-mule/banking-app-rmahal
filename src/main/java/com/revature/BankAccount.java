@@ -1,5 +1,5 @@
 package com.revature;
 
-abstract class BankAccount {
+abstract class BankAccount implements Withdrawable, Depositable, Transferable{
 	public abstract void checkBalance();
 }
