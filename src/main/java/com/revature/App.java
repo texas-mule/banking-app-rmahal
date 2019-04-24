@@ -207,6 +207,7 @@ public class App {
 				String sqlTwp = "INSERT INTO public.\"foodDB\" id, food) VALUES (?, ?);";
 				Statement stmt = connection.createStatement();
 				PreparedStatement ps = connection.prepareStatement(sqlTwp);
+				ps.execute(true);
 				ResultSet rs = stmt.executeQuery(sql);
 				System.out.println("DONE WITH DB.");
 				while(rs.next()) {
