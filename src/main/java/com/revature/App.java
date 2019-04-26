@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -39,25 +40,15 @@ public class App {
 			Scanner input = new Scanner(System.in);
 			int option = ensureScannerInt(input, 3, 0);
 			if(option == 1) {
-				login();
+				login(bankRowCounts);
 			}else if(option == 2) {
-				createAccount();
+				createAccount(userRowCount);
 			}else if(option == 0){
 				run = false;
 				break;
 			}else{
 				System.out.println("Incorrect option!!!!!");
-				while(1==1) {
-					int retryOption = input.nextInt();
-					if(retryOption == 1) {
-						login();
-					}else if(retryOption == 2) {
-						createAccount();
-					}else {
-						System.out.println("Incorrect option again closing program!!!!!");
-						break;
-					}
-				}
+				break;
 			}
 			System.out.println("Terminating loop!");
 			run = false;
@@ -66,74 +57,91 @@ public class App {
 		System.out.println("Terminating program!");
 	}
 	
-	public static void login() throws IOException{
+	public static void login(int bankRowCounts) throws IOException{
 		Scanner input = new Scanner(System.in);
-		System.out.println("\n");
 		System.out.println("=====================");
 		System.out.println("Please enter your login credentials when prompted...");
 		System.out.print("Please enter your username: ");
 		String username = input.next();
-		System.out.println(username);
 		System.out.print("Please enter your password: ");
 		String password = input.next();
-		System.out.println(password);
 		System.out.println("Checking Credentials!!!!");
 		boolean exists = authLogin(username, password);
 		if(exists) {
+			users currentUser = returnLoggedInUser(username,password);
 			System.out.println("USER LOGIN WAS A SUCCESS!");
-			succLogin();
+			succLogin(currentUser, bankRowCounts);
 		}else {
 			System.out.println("COULD NOT VERIFY PLEASE START OVER!");
 		}
 	}
 	
-	public static void succLogin() {
+	public static void succLogin(users currentUser, int row) {
+		ArrayList< BankAccount> accounts = new ArrayList<BankAccount>();
+		CheckingAccount checkAcc = new CheckingAccount();
+		checkAcc.Deposit(1000);
+		
+		accounts.add(checkAcc);
+		int i =0;
+		while(i<accounts.size()) {
+			System.out.println("Account: ");
+			accounts.get(i).checkBalance();
+			System.out.println("\n ");
+			i++;
+		}
+		System.out.println("DONE");
 		Scanner input = new Scanner(System.in);
-		System.out.println("Press 1 to create a new bank account.");
-		System.out.println("Press 2 to see current bank accounts.");
+		System.out.println("Press 0 to log out.");
+		System.out.println("Press 1 to see current bank accounts.");
+		System.out.println("Press 2 to create a new bank account.");
+		System.out.println("Press 3 to access an account.");
 		System.out.print("Please pick option: ");
-		int option = input.nextInt();
+		int option = ensureScannerInt(input, 4, 0);
 		if(option == 1) {
-			System.out.println("What kind of account?");
+			System.out.println("These are your accounts.");
+		}else if(option == 2) {
+			System.out.println("What kind of account would you like to apply for?");
 			System.out.println("Press 1 to create a new Checkings account.");
 			System.out.println("Press 2 to create a new Joint account.");
-			System.out.print("Please pick an option: ");
-			option = input.nextInt();
+			System.out.print("Please pick an option, ");
+			option = ensureScannerInt(input, 2, 1);
 			if(option == 1) {
+				saveNewBankAccount(currentUser, row, "Checking", 0, 2);	
 				System.out.println("Applied for new Checkings Account.");
-				CheckingAccount checkAcc = new CheckingAccount();
-				checkAcc.checkBalance();
-				singleAccountOptions(checkAcc);
+				System.out.println("Account created pending approval!........");
+				System.out.println("\n");
 			}else if(option == 2) {
 				System.out.println("Applied for new Joint Account.");
-				JointAccount jointAcc = new JointAccount();
-				jointAcc.checkBalance();
+				saveNewBankAccount(currentUser, row, "Joint", 0, 2);
+				System.out.println("Account created pending approval!");
+				System.out.println("NEED TO SET UP OTHER USER FOR JOINT ACCOUNT");
 			}
-		}else if(option == 2) {
-			System.out.println("Pressed 2 These are your accounts.");
 		}
 	}
 	
-	public static void createAccount() throws IOException{
+	//Method to create an account
+	public static void createAccount(int row) throws IOException{
+		int idNextRow = row;
 		Scanner input = new Scanner(System.in);
 		System.out.println("=====================");
 		System.out.println("Please enter your information for account creation when promped...");
+		System.out.print("Please enter your First Name: ");
+		String fname = input.next();	
+		System.out.print("Please enter your Last Name: ");
+		String lname = input.next();
 		System.out.print("Please enter your username: ");
 		String username = input.next();
 		System.out.println(username);
 		System.out.print("Please enter your password: ");
 		String password = input.next();
-		System.out.println(password);
-		try(FileWriter fw = new FileWriter("textfiles/mockUsersDB.txt", true);BufferedWriter bw = new BufferedWriter(fw);PrintWriter out = new PrintWriter(bw)){
-			out.println(username);
-			out.println(password);
-			out.close();
-		}
-		System.out.print("Account created successfully!");
-		System.out.print("Please Try Logging In.....");
-		login();
+		int authtype = 1;
+		saveAccount(row, fname, lname, username, password, authtype);
+		System.out.println("Account created successfully!");
+		System.out.println("Please Try Logging In.....");
+		login(row);
 	}
 	
+	//Allows access to account objects for generics
 	public static <T extends BankAccount> void singleAccountOptions(T account) {
 		while(1==1) {
 		int amount;
@@ -168,7 +176,7 @@ public class App {
 				account.checkBalance();
 				break;
 			case 0:
-				succLogin();
+				//succLogin();
 				break;
 			default:
 				System.out.println("Invalid option please try again....");
@@ -177,27 +185,34 @@ public class App {
 	  }			
 	}
 	
-	public static boolean authLogin(String username, String password) throws IOException {
-		BufferedReader bufferedReader;
-		boolean userExists = false;
-		try {
-			bufferedReader = new BufferedReader(new FileReader("textfiles/mockUsersDB.txt"));
-			String line;
-			while((line = bufferedReader.readLine()) != null) {
-				if(line.equals(username)) {
-					line = bufferedReader.readLine();
-					if(line.equals(password)) {
-						userExists = true;
-						break;
-					}
-				}
+	//Authenticates login with database checking
+	public static boolean authLogin(String inputusername, String inputpassword) throws IOException {
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String dbusername = "postgres";
+		String dbpassword = "test";
+		
+		try (
+			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
+			Statement statement = connection.createStatement();
+		) { 
+			String sql ="SELECT * FROM public.users WHERE username='"+inputusername+"' AND password='"+inputpassword+"'";
+
+			ResultSet resSet = statement.executeQuery(sql);
+			boolean returned = resSet.next();
+			if(returned) {
+				return true;
+			}else {
+				return false;
 			}
-		}catch (FileNotFoundException e){
-			e.printStackTrace();
-		}
-		return userExists;
+			
+			} catch (SQLException ex) {
+				System.out.println("DB did not work!");
+				System.out.println(ex.getMessage());
+				return false;
+			}
 	}
 
+	//Method to connect to the db
 	public static void connect() {
 		try {
 			Class.forName("org.postgresql.Driver");
@@ -211,7 +226,7 @@ public class App {
 		try (
 			Connection connection = DriverManager.getConnection(url,username,password);
 			Statement statement = connection.createStatement();
-		) {   // executeUpdate() returns the number of rows affected for DML
+		) { 
 				System.out.println("I work");
 				String sql = "SELECT id, food FROM public.\"foodDB\";";
 				String sqlTwp = "INSERT INTO public.\"foodDB\" id, food) VALUES (?, ?);";
@@ -232,8 +247,76 @@ public class App {
 			} 
 	}
 	
+	//Saves new user account to db
+	public static void saveAccount(int row, String fname, String lname, String username, String password, int authtype) {
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String dbusername = "postgres";
+		String dbpassword = "test";
+		
+		try (
+			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
+			Statement statement = connection.createStatement();
+		) { 
+			String sql = "INSERT INTO public.users( id, firstname, lastname, username, password, authtype) VALUES ("+row+", '"+fname+"', '"+lname+"', '"+username+"', '"+password+"', "+authtype+")";
+			ResultSet resSet = statement.executeQuery(sql);
+			resSet.close();
+				
+			} catch (SQLException ex) {
+				System.out.println("DB did not work saving user account!");
+				System.out.println(ex.getMessage());
+			}
+	}
 	
-	
+	//Saves new account to db
+	public static void saveNewBankAccount(users currentUser, int bankRow, String accounttype,int balance, int accountstatus) {
+		//account status 1 approved
+		//account status 2 pending
+		//account status 3 canceled/denied
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String dbusername = "postgres";
+		String dbpassword = "test";
+		
+		System.out.println("UserID: "+currentUser.id+" RowID: "+bankRow);
+		
+		try (
+			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
+			Statement statement = connection.createStatement();
+		) { 
+			String sql = "INSERT INTO public.bankaccounts (id, accounttype, balance, accountstatus) VALUES ("+bankRow+", '"+accounttype+"', "+balance+", "+accountstatus+")";
+			System.out.println(sql);
+			int resSet = statement.executeUpdate(sql);
+			System.out.println(resSet);
+			joinBankUser(currentUser, bankRow);
+			} catch (SQLException ex) {
+				System.out.println("DB did not work in saving new bank account!");
+				System.out.println(ex.getMessage());
+			}
+	}
+
+	//Fills in Join Table for user and new account
+	public static void joinBankUser(users currentUser, int bankrow) {
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String dbusername = "postgres";
+		String dbpassword = "test";
+		
+		try (
+			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
+			Statement statement = connection.createStatement();
+		) { 
+			int id = currentUser.id;
+			int row = bankrow;
+			System.out.println("UserID: "+id+" RowID: "+row);
+			String sql = "INSERT INTO public.joinusersbank (userid, bankaccountid) VALUES ("+id+","+row+")";
+			int resSet = statement.executeUpdate(sql);
+			System.out.println(resSet);
+			return;
+			} catch (SQLException ex) {
+				System.out.println("DB did not work in saving new bank account and user into join table!");
+				System.out.println(ex.getMessage());
+			}
+	}
+
+	//Method to know which is next available row for user counts
 	public static int returnUserRowCount() {
 		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
 		String username = "postgres";
@@ -242,7 +325,7 @@ public class App {
 		try (
 			Connection connection = DriverManager.getConnection(url,username,password);
 			Statement statement = connection.createStatement();
-		) {   // executeUpdate() returns the number of rows affected for DML
+		) { 
 			ResultSet resSet = statement.executeQuery("SELECT COUNT(*) AS rowcount FROM users");
 			resSet.next();
 			int count = resSet.getInt("rowcount");
@@ -256,12 +339,11 @@ public class App {
 			}
 	}
 	
-	
+	//Method to know which is next available row for bank accounts
 	public static int returnBankAccountRowCount() {
 		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
 		String username = "postgres";
-		String password = "test";
-		
+		String password = "test";	
 		try (
 			Connection connection = DriverManager.getConnection(url,username,password);
 			Statement statement = connection.createStatement();
@@ -279,43 +361,54 @@ public class App {
 			}
 	}
 	
-	
-	
-	//Ensures scanner gets proper input
-	public static int ensureScannerInt(Scanner input, int max, int attempts) {
-		int attempt = attempts; 
-//		System.out.println("ATTEMPT #"+attempt);
-		int options = max-1;
+	//Returns logged in user data
+	public static users returnLoggedInUser(String inputusername, String inputpassword) {
 		
-		if(attempt == 3) {
-			System.out.println("Too Many Failed Attempts Please Restart Application.");
-			return 0;
-		}else {
-			try {
-				System.out.println("choose between 0 and "+options);
-				System.out.print("Your Choice: ");
-				int choice = input.nextInt();
-				if(choice > options || choice < 0) {
-					attempt+=1;
-					ensureScannerInt(input, max, attempt);					
-				}else {
-					return choice;
-				}
-			}catch(InputMismatchException e) {
-				System.out.println("Mismatch hit");
-				if(attempt > 0) {
-					System.out.println("Invalid option please restart program");
-				}
-				attempt+=1;
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String dbusername = "postgres";
+		String dbpassword = "test";
+		
+		try (
+			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
+			Statement statement = connection.createStatement();
+		) { 
+			String sql ="SELECT * FROM public.users WHERE username='"+inputusername+"' AND password='"+inputpassword+"'";
+
+			ResultSet resSet = statement.executeQuery(sql);
+			resSet.next();
+			int id = resSet.getInt("id");
+			String fname = resSet.getString("firstname");
+			String lname = resSet.getString("lastname");
+			String username = resSet.getString("username");
+			String password = resSet.getString("password");
+			int authtype = resSet.getInt("authtype");
+			users currentUser = new users(id,fname,lname,username,password,authtype);
+			return currentUser;
+			} catch (SQLException ex) {
+				System.out.println("DB did not work!");
+				System.out.println(ex.getMessage());
 			}
-//			ensureScannerInt(input, max, attempt);
-		}
-		
-		
-		return 0;
+		return null;
 	}
 	
-	
-
-	
+	//Method to make sure inputs remain integer
+	public static int ensureScannerInt(Scanner input, int max, int min) {
+		int choice = -1 ; 
+		int choiceMax = max-1;
+		while(choice==-1) {
+            try {         
+               System.out.print("Your choice:");
+ 	           choice = input.nextInt();
+	           if(choice>choiceMax || choice<min){
+	                System.out.println("Sorry wrong input");
+	        	   choice=-1;
+	           }
+            }catch(Exception e) {
+                input.next();
+                System.out.println("Sorry wrong input");
+                choice=-1;
+            }
+        }
+		return choice;
+	}
 }
