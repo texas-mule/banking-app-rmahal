@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class App {
@@ -20,45 +21,54 @@ public class App {
 	
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub		
-		int accountsLine = 0;
 		boolean run = true;
-		App startApp = new App();
+		int userRowCount =returnUserRowCount();
+		userRowCount += 1;
+		System.out.println("Next available userid is: "+userRowCount);
+		int bankRowCounts =returnBankAccountRowCount();
+		bankRowCounts += 1;
+		System.out.println("Next available backaccountid is: "+bankRowCounts);
 		
-		startApp.DBTEST();
 		//Keeps the program running 
 		while(run) {
 			//Prompts the user the options available for this program
-			System.out.print("Press 1 to login... \nPress 2 to create a new account... \n");
-			//Scanner class for input as 
+			System.out.println("Type 0 at any point to end the program!");
+			System.out.println("Press 1 to login...");
+			System.out.println("Press 2 to create a new account...");
+			//Scanner class for input
 			Scanner input = new Scanner(System.in);
-			System.out.print("Your Choice: ");
-			int option = input.nextInt();
+			int option = ensureScannerInt(input, 3, 0);
 			if(option == 1) {
-				startApp.login(startApp);
+				login();
 			}else if(option == 2) {
-				startApp.createAccount(startApp);
-			}else {
+				createAccount();
+			}else if(option == 0){
+				run = false;
+				break;
+			}else{
 				System.out.println("Incorrect option!!!!!");
 				while(1==1) {
 					int retryOption = input.nextInt();
 					if(retryOption == 1) {
-						startApp.login(startApp);
+						login();
 					}else if(retryOption == 2) {
-						startApp.createAccount(startApp);
+						createAccount();
 					}else {
-						System.out.println("Incorrect option!!!!!");
+						System.out.println("Incorrect option again closing program!!!!!");
+						break;
 					}
 				}
 			}
-			System.out.println("Terminating loop");
+			System.out.println("Terminating loop!");
 			run = false;
 			input.close();
 		}
+		System.out.println("Terminating program!");
 	}
 	
-	public void login(App obj) throws IOException{
+	public static void login() throws IOException{
 		Scanner input = new Scanner(System.in);
-//		System.out.println("\n");
+		System.out.println("\n");
 		System.out.println("=====================");
 		System.out.println("Please enter your login credentials when prompted...");
 		System.out.print("Please enter your username: ");
@@ -68,16 +78,16 @@ public class App {
 		String password = input.next();
 		System.out.println(password);
 		System.out.println("Checking Credentials!!!!");
-		boolean exists = obj.authLogin(username, password);
+		boolean exists = authLogin(username, password);
 		if(exists) {
 			System.out.println("USER LOGIN WAS A SUCCESS!");
-			obj.succLogin(obj);
+			succLogin();
 		}else {
 			System.out.println("COULD NOT VERIFY PLEASE START OVER!");
 		}
 	}
 	
-	public void succLogin(App obj) {
+	public static void succLogin() {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Press 1 to create a new bank account.");
 		System.out.println("Press 2 to see current bank accounts.");
@@ -93,7 +103,7 @@ public class App {
 				System.out.println("Applied for new Checkings Account.");
 				CheckingAccount checkAcc = new CheckingAccount();
 				checkAcc.checkBalance();
-				obj.singleAccountOptions(obj, checkAcc);
+				singleAccountOptions(checkAcc);
 			}else if(option == 2) {
 				System.out.println("Applied for new Joint Account.");
 				JointAccount jointAcc = new JointAccount();
@@ -104,7 +114,7 @@ public class App {
 		}
 	}
 	
-	public void createAccount(App obj) throws IOException{
+	public static void createAccount() throws IOException{
 		Scanner input = new Scanner(System.in);
 		System.out.println("=====================");
 		System.out.println("Please enter your information for account creation when promped...");
@@ -121,10 +131,10 @@ public class App {
 		}
 		System.out.print("Account created successfully!");
 		System.out.print("Please Try Logging In.....");
-		obj.login(obj);
+		login();
 	}
 	
-	public <T extends BankAccount> void singleAccountOptions(App obj, T account) {
+	public static <T extends BankAccount> void singleAccountOptions(T account) {
 		while(1==1) {
 		int amount;
 		Scanner option = new Scanner(System.in);
@@ -158,7 +168,7 @@ public class App {
 				account.checkBalance();
 				break;
 			case 0:
-				obj.succLogin(obj);
+				succLogin();
 				break;
 			default:
 				System.out.println("Invalid option please try again....");
@@ -167,7 +177,7 @@ public class App {
 	  }			
 	}
 	
-	public boolean authLogin(String username, String password) throws IOException {
+	public static boolean authLogin(String username, String password) throws IOException {
 		BufferedReader bufferedReader;
 		boolean userExists = false;
 		try {
@@ -188,14 +198,14 @@ public class App {
 		return userExists;
 	}
 
-	public void DBTEST() {
+	public static void connect() {
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch(java.lang.ClassNotFoundException e) {
 			System.out.print(e.getMessage());
 		}
 		
-		String url  = "jdbc:postgresql://127.0.0.1:8082/postgres";
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
 		String username = "postgres";
 		String password = "test";
 		try (
@@ -207,7 +217,7 @@ public class App {
 				String sqlTwp = "INSERT INTO public.\"foodDB\" id, food) VALUES (?, ?);";
 				Statement stmt = connection.createStatement();
 				PreparedStatement ps = connection.prepareStatement(sqlTwp);
-				ps.execute(true);
+				ps.execute();
 				ResultSet rs = stmt.executeQuery(sql);
 				System.out.println("DONE WITH DB.");
 				while(rs.next()) {
@@ -222,33 +232,90 @@ public class App {
 			} 
 	}
 	
-	//Uneeded Getters and Setter for Thread Problem	
-//	public void incrementCount(int num) {
-//		this.bankAccountLines = num;
-//	}
-//	
-//	public int retBankAcountLineCount() {
-//		return this.bankAccountLines;
-//	}
+	
+	
+	public static int returnUserRowCount() {
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String username = "postgres";
+		String password = "test";
+		
+		try (
+			Connection connection = DriverManager.getConnection(url,username,password);
+			Statement statement = connection.createStatement();
+		) {   // executeUpdate() returns the number of rows affected for DML
+			ResultSet resSet = statement.executeQuery("SELECT COUNT(*) AS rowcount FROM users");
+			resSet.next();
+			int count = resSet.getInt("rowcount");
+			resSet.close();
+			return count;
+				
+			} catch (SQLException ex) {
+				System.out.println("DB did not work!");
+				System.out.println(ex.getMessage());
+				return 0;
+			}
+	}
+	
+	
+	public static int returnBankAccountRowCount() {
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String username = "postgres";
+		String password = "test";
+		
+		try (
+			Connection connection = DriverManager.getConnection(url,username,password);
+			Statement statement = connection.createStatement();
+		) {   // executeUpdate() returns the number of rows affected for DML
+			ResultSet resSet = statement.executeQuery("SELECT COUNT(*) AS rowcount FROM bankaccounts");
+			resSet.next();
+			int count = resSet.getInt("rowcount");
+			resSet.close();
+			return count;
+				
+			} catch (SQLException ex) {
+				System.out.println("DB did not work!");
+				System.out.println(ex.getMessage());
+				return 0;
+			}
+	}
+	
+	
+	
+	//Ensures scanner gets proper input
+	public static int ensureScannerInt(Scanner input, int max, int attempts) {
+		int attempt = attempts; 
+//		System.out.println("ATTEMPT #"+attempt);
+		int options = max-1;
+		
+		if(attempt == 3) {
+			System.out.println("Too Many Failed Attempts Please Restart Application.");
+			return 0;
+		}else {
+			try {
+				System.out.println("choose between 0 and "+options);
+				System.out.print("Your Choice: ");
+				int choice = input.nextInt();
+				if(choice > options || choice < 0) {
+					attempt+=1;
+					ensureScannerInt(input, max, attempt);					
+				}else {
+					return choice;
+				}
+			}catch(InputMismatchException e) {
+				System.out.println("Mismatch hit");
+				if(attempt > 0) {
+					System.out.println("Invalid option please restart program");
+				}
+				attempt+=1;
+			}
+//			ensureScannerInt(input, max, attempt);
+		}
+		
+		
+		return 0;
+	}
+	
+	
 
-	//Trying to make a new Thread to count the lines for parallel processing
-//	class lineReaderThread implements Runnable{
-//		public int lineCount;
-//		@Override
-//		public void run() {
-//			lineCount  = 0;
-//			try(BufferedReader fileReader = new BufferedReader(new FileReader("textfiles/bankAccounts.txt"));){
-//				synchronized(this) {
-//				while (fileReader.readLine() != null) lineCount++;
-//				notify();
-//				}
-//				fileReader.close();
-//	
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}	
-//	}
 	
 }
