@@ -131,82 +131,92 @@ public class Login {
 	}
 
 	public void successLogin(users currentUser, int bankRowCounts) {
-		int row = bankRowCounts;
-		ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
-		accounts = returnBankAccounts(currentUser);
-
-		System.out.println("LENGTH OF ACCOUNTS: ");
-		System.out.println(accounts.size());
-		boolean run = true;
-		while(run) {
-			Scanner input = new Scanner(System.in);
-			System.out.println("Press 0 to log out.");
-			System.out.println("Press 1 to see current bank accounts.");
-			System.out.println("Press 2 to create a new bank account.");
-			System.out.println("Press 3 to access an account.");
-			System.out.print("Please pick option: ");
-			int option = ensureScannerInt(input, 4, 0);
-			if(option == 1) {
-				System.out.println("These are your accounts.");
-				int i = 0;
-				System.out.println("ID\tTYPE\t\tBALANCE\tSTATUS");
-				while(i<accounts.size()) {
-					System.out.println(accounts.get(i).getId()+"\t"+accounts.get(i).getType()+"\t"+accounts.get(i).getBalance()+"\t"+accounts.get(i).getAccountstatus());
-					i++;
-				}
-
-			}else if(option == 2) {
-				System.out.println("What kind of account would you like to apply for?");
-				System.out.println("Press 1 to create a new Checkings account.");
-				System.out.println("Press 2 to create a new Joint account.");
-				System.out.print("Please pick an option, ");
-				option = ensureScannerInt(input, 3, 1);
+		if (currentUser.authtype == 1) {
+			
+		}else if(currentUser.authtype == 2) {
+			EmployeeLogin emplogin = new EmployeeLogin(currentUser);
+			emplogin.welcome();
+			
+		}else {
+			int row = bankRowCounts;
+			ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
+			boolean run = true;
+			while(run) {
+				accounts = returnBankAccounts(currentUser);
+				Scanner input = new Scanner(System.in);
+				System.out.println("Press 0 to log out.");
+				System.out.println("Press 1 to see current bank accounts.");
+				System.out.println("Press 2 to create a new bank account.");
+				System.out.println("Press 3 to access an account.");
+				System.out.print("Please pick option: ");
+				int option = ensureScannerInt(input, 4, 0);
 				if(option == 1) {
-					saveNewBankAccount(currentUser, row, "Checking", 0, 2);	
-					System.out.println("Applied for new Checkings Account.");
-					System.out.println("Account created pending approval!........");
-					System.out.println("\n");
-				}else if(option == 2) {
-					System.out.println("Applied for new Joint Account.");
-					saveNewBankAccount(currentUser, row, "Joint", 0, 2);
-					System.out.println("Account created pending approval!");
-					System.out.println("NEED TO SET UP OTHER USER FOR JOINT ACCOUNT");
-				}	
-			}else if(option == 3) {
-				System.out.println("Please enter id of account you wish to access");
-				System.out.print("Your choice: ");
-				int choice = ensureScannerInt(input, bankRowCounts+1,1);
-				int i = 0;
-				int pick = 0;
-				CheckingAccount ckaccount = null;
-				JointAccount joiaccount = null;
-				
-				while(i<accounts.size()){
-					if(accounts.get(i).getId() == choice) {
-						if(accounts.get(i).getType().equals("Checking") && accounts.get(i).getAccountstatus() == 1) {
-							ckaccount = new CheckingAccount(accounts.get(i).getId(), accounts.get(i).getBalance(),accounts.get(i).getType(),accounts.get(i).getAccountstatus());
-							pick = 1;
-						}else if(accounts.get(i).getType().equals("Checking") && accounts.get(i).getAccountstatus() == 1){
-							joiaccount = new JointAccount(accounts.get(i).getId(), accounts.get(i).getBalance(),accounts.get(i).getType(),accounts.get(i).getAccountstatus());
-							pick=2;
-						}
+					System.out.println("These are your accounts.");
+					int i = 0;
+					System.out.println("ID\tTYPE\t\tBALANCE\tSTATUS");
+					while(i<accounts.size()) {
+						System.out.println(accounts.get(i).getId()+"\t"+accounts.get(i).getType()+"\t"+accounts.get(i).getBalance()+"\t"+accounts.get(i).getAccountstatus());
+						i++;
 					}
-					i++;
-				}
-				
-				if(pick == 0) {
-					System.out.println("==============");
-					System.out.println("Invalid choice for bank account.....");
-					System.out.println("==============");
-				}else if(pick == 1) {
-					//System.out.println(ckaccount.getType());
-					singleAccountOptions(ckaccount, row);
+
+				}else if(option == 2) {
+					System.out.println("What kind of account would you like to apply for?");
+					System.out.println("Press 0 to go back.");
+					System.out.println("Press 1 to create a new Checkings account.");
+					System.out.println("Press 2 to create a new Joint account.");
+					System.out.print("Please pick an option, ");
+					option = ensureScannerInt(input, 3, 0);
+					if(option == 0) {
+						System.out.println("Going back!");
+					}else if(option == 1) {
+						saveNewBankAccount(currentUser, row, "Checking", 0, 2);	
+						System.out.println("Applied for new Checkings Account.");
+						System.out.println("Account created pending approval!........");
+						System.out.println("\n");
+					}else if(option == 2) {
+						System.out.println("Applied for new Joint Account.");
+						saveNewBankAccount(currentUser, row, "Joint", 0, 2);
+						System.out.println("Account created pending approval!");
+						System.out.println("NEED TO SET UP OTHER USER FOR JOINT ACCOUNT");
+					}	
+				}else if(option == 3) {
+					System.out.println("Please enter id of account you wish to access");
+					System.out.print("Your choice: ");
+					int choice = ensureScannerInt(input, bankRowCounts,1);
+					int i = 0;
+					int pick = 0;
+					CheckingAccount ckaccount = null;
+					JointAccount joiaccount = null;
+
+					while(i<accounts.size()){
+						System.out.println("Choice Was:"+choice);
+						System.out.println("Id rn is: "+accounts.get(i).getId());
+						if(accounts.get(i).getId() == choice) {
+							if(accounts.get(i).getType().equals("Checking") && accounts.get(i).getAccountstatus() == 1) {
+								ckaccount = new CheckingAccount(accounts.get(i).getId(), accounts.get(i).getBalance(),accounts.get(i).getType(),accounts.get(i).getAccountstatus());
+								pick = 1;
+							}else if(accounts.get(i).getType().equals("Joint\t") && accounts.get(i).getAccountstatus() == 1){
+								joiaccount = new JointAccount(accounts.get(i).getId(), accounts.get(i).getBalance(),accounts.get(i).getType(),accounts.get(i).getAccountstatus());
+								pick=2;
+							}
+						}
+						i++;
+					}
+
+					if(pick == 0) {
+						System.out.println("==============");
+						System.out.println("Invalid choice for bank account.....");
+						System.out.println("==============");
+					}else if(pick == 1) {
+						//System.out.println(ckaccount.getType());
+						singleAccountOptions(ckaccount, row);
+					}else {
+						singleAccountOptions(joiaccount, row);
+					}
+
 				}else {
-					singleAccountOptions(joiaccount, row);
+					break;
 				}
-				
-			}else {
-				break;
 			}
 		}
 	}
@@ -288,7 +298,8 @@ public class Login {
 	private void saveNewBankAccount(users currentUser, int row, String accounttype, int balance, int accountstatus) {
 		//account status 1 approved
 		//account status 2 pending
-		//account status 3 canceled/denied
+		//account status 3 denied
+		//account status 4 canceled
 		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
 		String dbusername = "postgres";
 		String dbpassword = "test";
@@ -381,11 +392,10 @@ public class Login {
 				Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
 				Statement statement = connection.createStatement();
 			) { 
-			System.out.println("CURRENT ID IS"+currentUser.id);
 		String sql = "WITH joinusersbank as(SELECT bankaccountid FROM joinusersbank WHERE userid="+currentUser.id+") SELECT * FROM joinusersbank INNER JOIN bankaccounts ON joinusersbank.bankaccountid = bankaccounts.id";
 		ResultSet resSet = statement.executeQuery(sql);
 		while(resSet.next()) {
-			System.out.println(resSet.getString("accounttype"));
+			//System.out.println(resSet.getString("accounttype"));
 			if(resSet.getString("accounttype").equals("Checking")) {
 				CheckingAccount chaccount = new CheckingAccount(resSet.getInt("id"), resSet.getDouble("balance"), resSet.getString("accounttype"), resSet.getInt("accountstatus"));
 				accounts.add(chaccount);
@@ -406,12 +416,13 @@ public class Login {
 	public static int ensureScannerInt(Scanner input, int max, int min) {
 		int choice = -1 ; 
 		int choiceMax = max-1;
+		System.out.println("MAX: "+max+" Choice Max:"+choiceMax);
 		while(choice==-1) {
             try {         
                System.out.print("Your choice:");
  	           choice = input.nextInt();
 	           if(choice>choiceMax || choice<min){
-	                System.out.println("Sorry wrong input");
+	                System.out.println("Invalid Input try again,");
 	        	   choice=-1;
 	           }
             }catch(Exception e) {

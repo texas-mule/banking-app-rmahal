@@ -1,5 +1,10 @@
 package com.revature;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 public class CheckingAccount extends BankAccount implements Withdrawable, Depositable, Transferable{
 
 	
@@ -67,6 +72,7 @@ public class CheckingAccount extends BankAccount implements Withdrawable, Deposi
 		// TODO Auto-generated method stub
 		if(amount < balance && amount > 0) {
 		this.balance = this.balance-amount;
+		saveTranstion();
 		}else if(amount < 0){
 			System.out.println("You tried to take out a negative value, please try again.");
 		}else{
@@ -79,6 +85,7 @@ public class CheckingAccount extends BankAccount implements Withdrawable, Deposi
 	public void Deposit(int amount) {
 		if(amount > 0) {
 		this.balance = this.balance+amount;
+		saveTranstion();
 		System.out.println("Your current balance is $"+this.balance);
 		}else {
 			System.out.println("Invalid amount being deposited please try again later!");
@@ -86,15 +93,59 @@ public class CheckingAccount extends BankAccount implements Withdrawable, Deposi
 	}
 	
 	//Method to transfer money from account to account
-	public void Transfer(int transferee, int amount) {
-		System.out.print("I NEED A BETTER IMPLEMENTATION");
+	public void Transfer(int transfereeID, int amount) {
+		CheckingAccount account = new CheckingAccount(this.id, this.balance, this.type,this.accountstatus);
+		
+		//account status 1 approved
+		//account status 2 pending
+		//account status 3 canceled
+		//account status 4 denied
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String dbusername = "postgres";
+		String dbpassword = "test";
+
+		try (
+			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
+			Statement statement = connection.createStatement();
+		) { 
+			String sql = "UPDATE public.bankaccounts SET id="+account.getId()+", accounttype='"+account.getType()+"', balance="+account.getBalance()+", accountstatus="+account.accountstatus+" WHERE id="+account.getId();
+			//System.out.println(sql);
+			int resSet = statement.executeUpdate(sql);
+			System.out.println("Transaction Saved!");
+			
+			} catch (SQLException ex) {
+				System.out.println("DB did not work in saving transaction!");
+				System.out.println(ex.getMessage());
+		}
+		
 	}
 	
 	
-	
-	private void saveAccountToDB() {
-		CheckingAccount account = new CheckingAccount(this.i,this.balance. this.accountstatus);
-	}
+	private void saveTranstion() {
+		CheckingAccount account = new CheckingAccount(this.id, this.balance, this.type,this.accountstatus);
+		
+		//account status 1 approved
+		//account status 2 pending
+		//account status 3 canceled
+		//account status 4 denied
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String dbusername = "postgres";
+		String dbpassword = "test";
+
+		try (
+			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
+			Statement statement = connection.createStatement();
+		) { 
+			String sql = "UPDATE public.bankaccounts SET id="+account.getId()+", accounttype='"+account.getType()+"', balance="+account.getBalance()+", accountstatus="+account.accountstatus+" WHERE id="+account.getId();
+			//System.out.println(sql);
+			int resSet = statement.executeUpdate(sql);
+			System.out.println("Transaction Saved!");
+			
+			} catch (SQLException ex) {
+				System.out.println("DB did not work in saving transaction!");
+				System.out.println(ex.getMessage());
+		}
+	} 
 	
 	
 	
