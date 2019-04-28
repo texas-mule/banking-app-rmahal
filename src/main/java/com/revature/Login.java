@@ -60,6 +60,7 @@ public class Login {
 		saveAccount(row, fname, lname, username, password, authtype);
 		System.out.println("Account created successfully!");
 		System.out.println("Please Try Logging In.....");
+		row++;
 		login(row);
 	}
 
@@ -131,7 +132,7 @@ public class Login {
 	}
 
 	public void successLogin(users currentUser, int bankRowCounts) {
-		if (currentUser.authtype == 1) {
+		if (currentUser.authtype == 3) {
 			
 		}else if(currentUser.authtype == 2) {
 			EmployeeLogin emplogin = new EmployeeLogin(currentUser);
@@ -172,11 +173,13 @@ public class Login {
 						saveNewBankAccount(currentUser, row, "Checking", 0, 2);	
 						System.out.println("Applied for new Checkings Account.");
 						System.out.println("Account created pending approval!........");
+						row++;
 						System.out.println("\n");
 					}else if(option == 2) {
 						System.out.println("Applied for new Joint Account.");
 						saveNewBankAccount(currentUser, row, "Joint", 0, 2);
 						System.out.println("Account created pending approval!");
+						row++;
 						System.out.println("NEED TO SET UP OTHER USER FOR JOINT ACCOUNT");
 					}	
 				}else if(option == 3) {

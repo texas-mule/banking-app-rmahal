@@ -128,7 +128,6 @@ public class EmployeeLogin {
 		
 	}
 	
-	
 	public ArrayList<BankAccount> returnPendingBankAccounts() {
 		
 		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
@@ -159,7 +158,6 @@ public class EmployeeLogin {
 		return accounts;
 	}
 	
-	
 	private void editBankAccountStatus() {
 		ArrayList<BankAccount> accounts = new ArrayList();
 		accounts = returnPendingBankAccounts();
@@ -167,22 +165,64 @@ public class EmployeeLogin {
 
 		int i=0;
 		while(i<accounts.size()) {
-			System.out.println(accounts.get(i).getId()+"\t"+accounts.get(i).getBalance()+"\t"+accounts.get(i).getId()+"\t"+accounts.get(i).getAccountstatus());
+			System.out.println(accounts.get(i).getId()+"\t"+accounts.get(i).getBalance()+"\t"+accounts.get(i).getType()+"\t"+accounts.get(i).getAccountstatus());
 			i++;
 		}
 		boolean run = true;
+		CheckingAccount ca = null;
+		JointAccount ja = null;
 		while(run) {
+			accounts = returnPendingBankAccounts();
 			System.out.println("Select account to update by their id... press 0 to back out");
-			int choice = ensureScannerInt(input, 100000, 0);
-			while(i<accounts.size()) {
-				if(accounts.get(i).getId() == choice) {
-
+			int max =returnBankAccountRowCount();
+			int choice = ensureScannerInt(input, max+1, 0);
+			if(choice == 0) {
+				run = false;
+				break;
+			}else {
+				i=0;
+				while(i<accounts.size()) {
+					System.out.println("Choice: "+choice+" Id:"+accounts.get(i).getId());
+					if(accounts.get(i).getId() == choice) {
+						if(accounts.get(i).getType().equals("Checking")){
+							ca = new CheckingAccount(accounts.get(i).getId(),accounts.get(i).getBalance(), accounts.get(i).getType(), accounts.get(i).getAccountstatus());
+							break;
+						}else {
+							ja = new JointAccount(accounts.get(i).getId(),accounts.get(i).getBalance(), accounts.get(i).getType(), accounts.get(i).getAccountstatus());
+							break;
+						}
+					}
+					i++;
 				}
-				i++;
+				if(ja == null && ca == null) {
+					System.out.println("Invalid choice backing out.");
+					break;
+				}else {
+					System.out.println("Select 1 to approve account.");
+					System.out.println("Select 2 to deny account.");
+					int status = ensureScannerInt(input, 3, 1);
+					System.out.println(ca);
+					if(status == 1) {
+						if(ca != null) {
+							ca.setAccountstatus(1);
+							saveTranstion(ca);
+						}else {
+							ja.setAccountstatus(1);
+							saveTranstion(ja);
+						}
+					}else if(status == 2) {
+						if(ca != null) {
+							ca.setAccountstatus(3);
+							saveTranstion(ca);
+						}else {
+							ja.setAccountstatus(3);
+							saveTranstion(ja);
+						}
+					}
+				}
 			}
 		}
 	}
-	
 	
 	public static int ensureScannerInt(Scanner input, int max, int min) {
 		int choice = -1 ; 
@@ -204,12 +244,10 @@ public class EmployeeLogin {
 		return choice;
 	}
 	
-	
-	
-	
 	private void saveTranstion(BankAccount ba) {
-		CheckingAccount account = new CheckingAccount(ba.getId(), ba.getBalance(), ba.getType(),ba.getAccountstatus());
 		
+		CheckingAccount account = new CheckingAccount(ba.getId(), ba.getBalance(), ba.getType(),ba.getAccountstatus());
+		System.out.println("ACCOUNT TYPE ="+ba.getType());
 		//account status 1 approved
 		//account status 2 pending
 		//account status 3 canceled
@@ -222,7 +260,7 @@ public class EmployeeLogin {
 			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
 			Statement statement = connection.createStatement();
 		) { 
-			String sql = "UPDATE public.bankaccounts SET id="+account.getId()+", accounttype='"+account.getType()+"', balance="+account.getBalance()+", accountstatus="+account.accountstatus+" WHERE id="+account.getId();
+			String sql = "UPDATE public.bankaccounts SET id="+ba.getId()+", accounttype='"+ba.getType()+"', balance="+ba.getBalance()+", accountstatus="+ba.getAccountstatus()+" WHERE id="+ba.getId();
 			//System.out.println(sql);
 			int resSet = statement.executeUpdate(sql);
 			System.out.println("Transaction Saved!");
@@ -233,7 +271,25 @@ public class EmployeeLogin {
 		}
 	} 
 	
-	
-	
+	public static int returnBankAccountRowCount() {
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String username = "postgres";
+		String password = "test";	
+		try (
+			Connection connection = DriverManager.getConnection(url,username,password);
+			Statement statement = connection.createStatement();
+		) {   // executeUpdate() returns the number of rows affected for DML
+			ResultSet resSet = statement.executeQuery("SELECT COUNT(*) AS rowcount FROM bankaccounts");
+			resSet.next();
+			int count = resSet.getInt("rowcount");
+			resSet.close();
+			return count;
+				
+			} catch (SQLException ex) {
+				System.out.println("DB did not work!");
+				System.out.println(ex.getMessage());
+				return 0;
+			}
+	}
 	
 }
