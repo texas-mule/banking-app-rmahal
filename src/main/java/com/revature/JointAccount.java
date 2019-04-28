@@ -2,11 +2,10 @@ package com.revature;
 
 public class JointAccount extends BankAccount implements Withdrawable, Depositable, Transferable{
 
-
-	private int balance;
+	public int id;
+	private double balance;
 	private String type;
-	protected boolean active;
-	public int acountNumber;
+	public int accountstatus;
 	
 	
 	//Constructor
@@ -15,7 +14,46 @@ public class JointAccount extends BankAccount implements Withdrawable, Depositab
 		this.type = "Joint";
 	}
 	
+	JointAccount(int id, double balance, String type, int accountstatus){
+		this.id = id;
+		this.balance = balance;
+		this.type = "Joint\t";
+		this.accountstatus = accountstatus;
+		
+	}
 	
+	public int getId() {
+		return id;
+	}
+	
+	public int setId() {
+		return id;
+	}
+
+	public double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(double balance) {
+		this.balance = balance;
+	}
+
+
+	public int getAccountstatus() {
+		return accountstatus;
+	}
+
+
+	public void setAccountstatus(int accountstatus) {
+		this.accountstatus = accountstatus;
+	}
+
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+
 	//Method to check Balance of the account
 	@Override
 	public void checkBalance() {
@@ -23,27 +61,7 @@ public class JointAccount extends BankAccount implements Withdrawable, Depositab
 		System.out.println("Your balance is: $"+this.balance);
 	}
 
-	//Method to toggle activity, when employee or admin want to alter
-	public void toggleActive() {
-		if(this.active == true) {
-			this.active = false;
-			System.out.println("Account is now deactivated.");
-		}else {
-			this.active = true;
-			System.out.println("Account is now activated!.");
-		}
-	}
-	
 
-	//Method to let user check the status of their account after applying for one
-	public void checkStatus() {
-		if(this.active == true) {
-			System.out.println("Account is currently deactivated.");
-		}else {
-			this.active = true;
-			System.out.println("Account is currently activated!.");
-		}
-	}
 	
 	//Method to withdraw money from their bank account
 	public void Withdraw(int amount) {
@@ -68,12 +86,12 @@ public class JointAccount extends BankAccount implements Withdrawable, Depositab
 	}
 	
 	//Method to transfer money from account to account
-	public void Transfer(int transferer, int transferee, int amount) {
+	public void Transfer(int transferee, int amount) {
 		
 	}
 	
 	//Method to return the type of account
 	public String getType() {
 		return type;
-	}	
+	}
 }

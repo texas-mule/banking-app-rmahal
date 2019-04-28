@@ -2,11 +2,11 @@ package com.revature;
 
 public class CheckingAccount extends BankAccount implements Withdrawable, Depositable, Transferable{
 
-	private int balance;
-	private String type;
-	protected boolean active;
-	public int acountNumber;
 	
+	public int id;
+	public String type;
+	public double balance;
+	public int accountstatus;
 	
 	//Constructor
 	CheckingAccount(){
@@ -14,44 +14,51 @@ public class CheckingAccount extends BankAccount implements Withdrawable, Deposi
 		this.type = "Checking";
 	}
 	
+	CheckingAccount(int id, double balance, String type, int accountstatus){
+		this.id = id;
+		this.balance = balance;
+		this.type = "Checking";
+		this.accountstatus = accountstatus;	
+	}
 	
-	//Getter for account number
-	public int getAcountNumber() {
-		return acountNumber;
+	
+	public int getId() {
+		return id;
+	}
+	
+	public int setId() {
+		return id;
 	}
 
-	//Setter for account number
-	public void setAcountNumber(int acountNumber) {
-		this.acountNumber = acountNumber;
+	public String getType() {
+		return type;
 	}
 
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(double balance) {
+		this.balance = balance;
+	}
+
+	public int getAccountstatus() {
+		return accountstatus;
+	}
+
+	public void setAccountstatus(int accountstatus) {
+		this.accountstatus = accountstatus;
+	}
 	
 	//Method to check balance of account
 	@Override
 	public void checkBalance() {
 		// TODO Auto-generated method stub
 		System.out.println("Your balance is: $"+this.balance);
-	}
-
-	//Method to toggle activity, when employee or admin want to alter
-	public void toggleActive() {
-		if(this.active == true) {
-			this.active = false;
-			System.out.println("Account is now deactivated.");
-		}else {
-			this.active = true;
-			System.out.println("Account is now activated!.");
-		}
-	}
-	
-	//Method to let user check the status of their account after applying for one
-	public void checkStatus() {
-		if(this.active == true) {
-			System.out.println("Account is currently deactivated.");
-		}else {
-			this.active = true;
-			System.out.println("Account is currently activated!.");
-		}
 	}
 	
 	
@@ -79,13 +86,19 @@ public class CheckingAccount extends BankAccount implements Withdrawable, Deposi
 	}
 	
 	//Method to transfer money from account to account
-	public void Transfer(int transferer, int transferee, int amount) {
+	public void Transfer(int transferee, int amount) {
 		System.out.print("I NEED A BETTER IMPLEMENTATION");
 	}
-
-	//Method to return the type of account
-	public String getType() {
-		return type;
+	
+	
+	
+	private void saveAccountToDB() {
+		CheckingAccount account = new CheckingAccount(this.i,this.balance. this.accountstatus);
 	}
 	
+	
+	
+	
+	
+
 }

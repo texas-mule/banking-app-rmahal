@@ -1,8 +1,7 @@
 package com.revature;
 
-public class users {
-	
-	
+public class Employees extends users{
+
 	public int id;
 	public String firstname;
 	public String lastname;
@@ -10,7 +9,8 @@ public class users {
 	public String password;
 	public int authtype;
 	
-	users(int id, String firstname, String lastname, String username, String password, int authtype){
+	Employees(int id, String firstname, String lastname, String username, String password, int authtype){
+		super(authtype, password, password, password, password, authtype);
 		this.id = id;
 		this.firstname = firstname;
 		this.lastname = lastname;
@@ -18,7 +18,6 @@ public class users {
 		this.password = password;
 		this.authtype = authtype;
 	}
-	
 	
 	public int getId() {
 		return id;
@@ -66,6 +65,10 @@ public class users {
 
 	public void setAuthtype(int authtype) {
 		this.authtype = authtype;
+	}	
+	
+	public void seeAllAccounts() {
+		
 	}
-
+	
 }
