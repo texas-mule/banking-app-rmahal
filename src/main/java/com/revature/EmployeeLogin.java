@@ -52,7 +52,7 @@ public class EmployeeLogin {
 	
 	}
 	
-	private void viewAllUserAccounts() {
+	protected void viewAllUserAccounts() {
 
 		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
 		String dbusername = "postgres";
@@ -76,7 +76,7 @@ public class EmployeeLogin {
 		}
 	}
 	
-	private void viewAllBankAccounts() {
+	protected void viewAllBankAccounts() {
 		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
 		String dbusername = "postgres";
 		String dbpassword = "test";
@@ -102,7 +102,7 @@ public class EmployeeLogin {
 		
 	}
 	
-	private void viewAllPendingBankAccounts() {
+	protected void viewAllPendingBankAccounts() {
 		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
 		String dbusername = "postgres";
 		String dbpassword = "test";
@@ -128,7 +128,7 @@ public class EmployeeLogin {
 		
 	}
 	
-	public ArrayList<BankAccount> returnPendingBankAccounts() {
+	protected ArrayList<BankAccount> returnPendingBankAccounts() {
 		
 		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
 		String dbusername = "postgres";
@@ -158,7 +158,7 @@ public class EmployeeLogin {
 		return accounts;
 	}
 	
-	private void editBankAccountStatus() {
+	protected void editBankAccountStatus() {
 		ArrayList<BankAccount> accounts = new ArrayList();
 		accounts = returnPendingBankAccounts();
 		Scanner input = new Scanner(System.in);
@@ -244,7 +244,7 @@ public class EmployeeLogin {
 		return choice;
 	}
 	
-	private void saveTranstion(BankAccount ba) {
+	protected void saveTranstion(BankAccount ba) {
 		
 		CheckingAccount account = new CheckingAccount(ba.getId(), ba.getBalance(), ba.getType(),ba.getAccountstatus());
 		System.out.println("ACCOUNT TYPE ="+ba.getType());

@@ -2,8 +2,10 @@ package com.revature;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class JointAccount extends BankAccount implements Withdrawable, Depositable, Transferable{
 
@@ -96,9 +98,77 @@ public class JointAccount extends BankAccount implements Withdrawable, Depositab
 	}
 	
 	//Method to transfer money from account to account
-	public void Transfer(int transferee, int amount) {
-		
+	public void Transfer(int transfereeID, double amount) {
+		if(amount < 0 || amount >this.balance) {
+			System.out.println("Invalid funds for transaction or invalid inpout please try again!");
+			return;
+		}else {
+			ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
+			accounts.add(retrieveAccount(this.id));
+			accounts.add(retrieveAccount(transfereeID));
+			this.readyForTransfer(accounts, amount);
+		}
 	}
+	
+	
+	private BankAccount retrieveAccount(int id) {
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String dbusername = "postgres";
+		String dbpassword = "test";
+		CheckingAccount ca =null;
+		JointAccount ja =null;		
+		
+		try (
+				Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
+				Statement statement = connection.createStatement();
+		) { 
+		String sql = "SELECT * FROM bankaccounts WHERE id="+id;
+		//System.out.println(sql);
+		ResultSet resSet = statement.executeQuery(sql);
+		resSet.next();
+		if(resSet.getString("accounttype").equals("Checking")) {
+			ca = new CheckingAccount(resSet.getInt("id"),resSet.getDouble("balance"), resSet.getString("accounttype"), resSet.getInt("accountstatus"));
+		}else {
+			ja = new JointAccount(resSet.getInt("id"),resSet.getDouble("balance"), resSet.getString("accounttype"), resSet.getInt("accountstatus"));
+		}
+		
+		if(ca != null) {
+			return ca;
+		}else {
+			return ja;
+		}
+		
+		} catch (SQLException ex) {
+			System.out.println("DB did not work in saving transaction!");
+			System.out.println(ex.getMessage());
+	}
+		
+		return null;
+	}
+	
+	
+	private void readyForTransfer(ArrayList<BankAccount> accounts, double amount) {
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String dbusername = "postgres";
+		String dbpassword = "test";
+		double senderBal = accounts.get(0).getBalance()-amount;
+		double recieverBal = accounts.get(1).getBalance()+amount;
+		
+		try (
+				Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
+				Statement statement = connection.createStatement();
+		) { 
+		String sql = "UPDATE public.bankaccounts SET id="+accounts.get(0).getId()+", accounttype='"+accounts.get(0).getType()+"', balance="+senderBal+", accountstatus="+accounts.get(0).getAccountstatus()+" WHERE id="+accounts.get(0).getId()+";"+"UPDATE public.bankaccounts SET id="+accounts.get(1).getId()+", accounttype='"+accounts.get(1).getType()+"', balance="+recieverBal+", accountstatus="+accounts.get(1).getAccountstatus()+" WHERE id="+accounts.get(1).getId()+";";
+		//System.out.println(sql);
+		int resSet = statement.executeUpdate(sql);
+		System.out.println("Transfer Completed!");
+		
+		} catch (SQLException ex) {
+			System.out.println("DB did not work in saving transaction!");
+			System.out.println(ex.getMessage());
+	}
+	}
+	
 	
 	//Method to return the type of account
 	public String getType() {
@@ -109,10 +179,6 @@ public class JointAccount extends BankAccount implements Withdrawable, Depositab
 	private void saveTranstion() {
 		JointAccount account = new JointAccount(this.id, this.balance, this.type,this.accountstatus);
 		
-		//account status 1 approved
-		//account status 2 pending
-		//account status 3 canceled
-		//account status 4 denied
 		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
 		String dbusername = "postgres";
 		String dbpassword = "test";
@@ -128,6 +194,34 @@ public class JointAccount extends BankAccount implements Withdrawable, Depositab
 			
 			} catch (SQLException ex) {
 				System.out.println("DB did not work in saving transaction!");
+				System.out.println(ex.getMessage());
+		}
+	} 
+	
+	
+	
+	@Override
+	public void addUserToAccount(int id) {
+
+		this.addUserToJoint(id);
+	}
+	
+	
+	private void addUserToJoint(int id) {
+		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
+		String dbusername = "postgres";
+		String dbpassword = "test";
+
+		try (
+			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
+			Statement statement = connection.createStatement();
+		) { 
+			String sql = "INSERT INTO public.joinusersbank(userid, bankaccountid) VALUES ("+id+", "+this.id+");";
+			int resSet = statement.executeUpdate(sql);
+			System.out.println("Account has been added to this join account!");
+			
+			} catch (SQLException ex) {
+				System.out.println("DB did not work in adding user to join account!");
 				System.out.println(ex.getMessage());
 		}
 	} 

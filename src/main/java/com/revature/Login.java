@@ -24,13 +24,9 @@ public class Login {
 			Scanner input = new Scanner(System.in);
 			int option = ensureScannerInt(input, 3, 0);
 			if(option == 1) {
-				
 				login(bankRowCounts);
-				
 			}else if(option == 2) {
-				
 				createAccount(userRowCounts);
-				
 			}else if(option == 0){
 				run = false;
 				break;
@@ -65,7 +61,6 @@ public class Login {
 	}
 
 	public void saveAccount(int row, String fname, String lname, String username, String password, int authtype) {
-		// TODO Auto-generated method stub
 		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
 		String dbusername = "postgres";
 		String dbpassword = "test";
@@ -133,7 +128,8 @@ public class Login {
 
 	public void successLogin(users currentUser, int bankRowCounts) {
 		if (currentUser.authtype == 3) {
-			
+			AdminLogin adlogin = new AdminLogin(currentUser);
+			adlogin.welcome();
 		}else if(currentUser.authtype == 2) {
 			EmployeeLogin emplogin = new EmployeeLogin(currentUser);
 			emplogin.welcome();
@@ -192,8 +188,8 @@ public class Login {
 					JointAccount joiaccount = null;
 
 					while(i<accounts.size()){
-						System.out.println("Choice Was:"+choice);
-						System.out.println("Id rn is: "+accounts.get(i).getId());
+						//System.out.println("Choice Was:"+choice);
+						//System.out.println("Id rn is: "+accounts.get(i).getId());
 						if(accounts.get(i).getId() == choice) {
 							if(accounts.get(i).getType().equals("Checking") && accounts.get(i).getAccountstatus() == 1) {
 								ckaccount = new CheckingAccount(accounts.get(i).getId(), accounts.get(i).getBalance(),accounts.get(i).getType(),accounts.get(i).getAccountstatus());
@@ -224,7 +220,6 @@ public class Login {
 		}
 	}
 
-	
 	private void singleAccountOptions(BankAccount account, int row) {
 		System.out.println("BANK ACCOUNT # "+account.getId());
 		Scanner input = new Scanner(System.in);
@@ -260,10 +255,10 @@ public class Login {
 		}else {
 			//Joint account
 			while(run) {
-				System.out.println("Press 0 to return...");
 				System.out.println("What transaction would you like to do?");
-				System.out.println("Press 1 to Deposit...");
-				System.out.println("Press 2 to Withdraw...");
+				System.out.println("Press 0 to return...");
+				System.out.println("Press 1 to Withdraw...");
+				System.out.println("Press 2 to Deposit...");
 				System.out.println("Press 3 to Transfer...");
 				System.out.println("Press 4 to add another user to the account...");
 				int choice = ensureScannerInt(input, 5, 0);
@@ -284,7 +279,7 @@ public class Login {
 				}else if(choice == 4) {
 					System.out.println("Please enter id of person you wish to add to the account!");
 					int where = ensureScannerInt(input, row+1, 1);
-					
+					account.addUserToAccount(where);
 				}else {
 					run = false;
 					break;
@@ -419,7 +414,7 @@ public class Login {
 	public static int ensureScannerInt(Scanner input, int max, int min) {
 		int choice = -1 ; 
 		int choiceMax = max-1;
-		System.out.println("MAX: "+max+" Choice Max:"+choiceMax);
+		//System.out.println("MAX: "+max+" Choice Max:"+choiceMax);
 		while(choice==-1) {
             try {         
                System.out.print("Your choice:");
@@ -455,8 +450,6 @@ public class Login {
         }
 		return choice;
 	}
-	
-	
 	
 	public static int ensureBalanceScannerInt(Scanner input, int max, int min) {
 		int choice = -1 ; 
