@@ -201,29 +201,22 @@ public class JointAccount extends BankAccount implements Withdrawable, Depositab
 	
 	
 	@Override
-	public void addUserToAccount(int id) {
-
-		this.addUserToJoint(id);
+	public boolean addUserToAccount(Users currentUser,int id) {
+		boolean success = false;
+		if(currentUser.id == id) {
+			System.out.println("Cannot add yourself to the account please try again.");
+			return false;
+		}else {
+			success = this.addUserToJoint(id);
+			return success;
+		}
 	}
 	
 	
-	private void addUserToJoint(int id) {
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String dbusername = "postgres";
-		String dbpassword = "test";
-
-		try (
-			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
-			Statement statement = connection.createStatement();
-		) { 
-			String sql = "INSERT INTO public.joinusersbank(userid, bankaccountid) VALUES ("+id+", "+this.id+");";
-			int resSet = statement.executeUpdate(sql);
-			System.out.println("Account has been added to this join account!");
-			
-			} catch (SQLException ex) {
-				System.out.println("DB did not work in adding user to join account!");
-				System.out.println(ex.getMessage());
-		}
+	private boolean addUserToJoint(int userid) {
+		JoinTableDao jtd = new JoinTableDao();
+		return jtd.addUserToJoint(userid, this.id);
+		
 	} 
 	
 	

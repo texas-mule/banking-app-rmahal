@@ -12,7 +12,7 @@ public class EmployeeLogin {
 	
 	Employees employee;
 	
-	EmployeeLogin(users currentUser){
+	EmployeeLogin(Users currentUser){
 		this.employee = (Employees) currentUser;
 	}
 

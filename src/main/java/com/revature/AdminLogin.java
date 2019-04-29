@@ -12,7 +12,7 @@ public class AdminLogin {
 	
 	Admin admin;
 	
-	AdminLogin(users currentUser){
+	AdminLogin(Users currentUser){
 		this.admin = (Admin) currentUser;
 	}
 	
@@ -48,7 +48,7 @@ public class AdminLogin {
 	}
 	
 	
-	public void userChoice(users currentUser) {
+	public void userChoice(Users currentUser) {
 		boolean run = true;
 		Scanner input = new Scanner(System.in);
 		while(run) {
@@ -93,7 +93,7 @@ public class AdminLogin {
 		
 	}
 	
-	private void viewAllBankAccounts(users currentUser) {
+	private void viewAllBankAccounts(Users currentUser) {
 		boolean run = true;
 		Scanner input = new Scanner(System.in);
 		while(run) {
@@ -208,5 +208,4 @@ public class AdminLogin {
 				return 0;
 			}
 	}
-
 }

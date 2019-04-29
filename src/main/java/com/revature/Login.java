@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Login {
-	Login(){
-	}
 
 	public void welcome(boolean running, int userRow, int bankRow) throws IOException {
 		boolean run = running;
@@ -88,9 +86,10 @@ public class Login {
 		System.out.print("Please enter your password: ");
 		String password = ensureScannerString(input);
 		System.out.println("Checking Credentials!!!!");
-		boolean exists = authLogin(username, password);//PINNED
+		UserTableDao utd = new UserTableDao();
+		boolean exists = utd.getIfUserExists(username, password);//PINNED
 		if(exists) {
-			users currentUser = returnLoggedInUser(username,password);
+			Users currentUser = returnLoggedInUser(username,password);
 			System.out.println("AuthType");
 			System.out.println(currentUser.authtype);
 			System.out.println("USER LOGIN WAS A SUCCESS!");
@@ -101,32 +100,11 @@ public class Login {
 	}
 
 	public boolean authLogin(String username, String password) {
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String dbusername = "postgres";
-		String dbpassword = "test";
-		
-		try (
-			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
-			Statement statement = connection.createStatement();
-		) { 
-			String sql ="SELECT * FROM public.users WHERE username='"+username+"' AND password='"+password+"'";
-	
-			ResultSet resSet = statement.executeQuery(sql);
-			boolean returned = resSet.next();
-			if(returned) {
-				return true;
-			}else {
-				return false;
-			}
-			
-			} catch (SQLException ex) {
-				System.out.println("DB did not work!");
-				System.out.println(ex.getMessage());
-				return false;
-			}
+		UserTableDao utd = new UserTableDao();
+		return utd.authUser(username, password);
 	}
 
-	public void successLogin(users currentUser, int bankRowCounts) {
+	public void successLogin(Users currentUser, int bankRowCounts) {
 		if (currentUser.authtype == 3) {
 			AdminLogin adlogin = new AdminLogin(currentUser);
 			adlogin.welcome();
@@ -174,7 +152,6 @@ public class Login {
 					}else if(option == 2) {
 						System.out.println("Applied for new Joint Account.");
 						saveNewBankAccount(currentUser, row, "Joint", 0, 2);
-						System.out.println("Account created pending approval!");
 						row++;
 						System.out.println("NEED TO SET UP OTHER USER FOR JOINT ACCOUNT");
 					}	
@@ -208,9 +185,9 @@ public class Login {
 						System.out.println("==============");
 					}else if(pick == 1) {
 						//System.out.println(ckaccount.getType());
-						singleAccountOptions(ckaccount, row);
+						singleAccountOptions(currentUser, ckaccount, row);
 					}else {
-						singleAccountOptions(joiaccount, row);
+						singleAccountOptions(currentUser, joiaccount, row);
 					}
 
 				}else {
@@ -220,7 +197,7 @@ public class Login {
 		}
 	}
 
-	private void singleAccountOptions(BankAccount account, int row) {
+	private void singleAccountOptions(Users currentUser,BankAccount account, int row) {
 		System.out.println("BANK ACCOUNT # "+account.getId());
 		Scanner input = new Scanner(System.in);
 		boolean run=true;
@@ -279,7 +256,12 @@ public class Login {
 				}else if(choice == 4) {
 					System.out.println("Please enter id of person you wish to add to the account!");
 					int where = ensureScannerInt(input, row+1, 1);
-					account.addUserToAccount(where);
+					boolean response = account.addUserToAccount(currentUser, where);
+					if(response) {
+						System.out.println("Successful in adding user!");
+					}else {
+						System.out.println("Error in adding user please try again!");
+					}
 				}else {
 					run = false;
 					break;
@@ -289,132 +271,45 @@ public class Login {
 		
 	}
 	
-	private void addAnotherUserToJointAccount(int id) {
-		
-	}
-	
-	private void saveNewBankAccount(users currentUser, int row, String accounttype, int balance, int accountstatus) {
-		//account status 1 approved
-		//account status 2 pending
-		//account status 3 denied
-		//account status 4 canceled
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String dbusername = "postgres";
-		String dbpassword = "test";
-		
-		System.out.println("UserID: "+currentUser.id+" RowID: "+row);
-		
-		try (
-			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
-			Statement statement = connection.createStatement();
-		) { 
-			String sql = "INSERT INTO public.bankaccounts (id, accounttype, balance, accountstatus) VALUES ("+row+", '"+accounttype+"', "+balance+", "+accountstatus+")";
-			System.out.println(sql);
-			int resSet = statement.executeUpdate(sql);
-			System.out.println(resSet);
-			joinBankUser(currentUser, row);
-			} catch (SQLException ex) {
-				System.out.println("DB did not work in saving new bank account!");
-				System.out.println(ex.getMessage());
+	private void saveNewBankAccount(Users currentUser, int row, String accounttype, double balance, int accountstatus) {
+		BankTableDao btd = new BankTableDao();
+		boolean success = false;
+		CheckingAccount ca = null;
+		JointAccount ja = null;
+		if(accounttype.equals("Checking")) {
+			ca = new CheckingAccount(row, balance, accounttype, accountstatus);
+			success = btd.insertAccount(currentUser, row, ca);
+		}else {
+			ja = new JointAccount(row, balance, accounttype, accountstatus);
+			success = btd.insertAccount(currentUser, row, ja);
 		}
-		
-	}
-	
-	private void joinBankUser(users currentUser, int row) {
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String dbusername = "postgres";
-		String dbpassword = "test";
-		
-		try (
-			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
-			Statement statement = connection.createStatement();
-		) { 
-			int id = currentUser.id;
-			System.out.println("UserID: "+id+" RowID: "+row);
-			String sql = "INSERT INTO public.joinusersbank (userid, bankaccountid) VALUES ("+id+","+row+")";
-			int resSet = statement.executeUpdate(sql);
-			System.out.println(resSet);
-			return;
-			} catch (SQLException ex) {
-				System.out.println("DB did not work in saving new bank account and user into join table!");
-				System.out.println(ex.getMessage());
-			}
-	}
-
-	public users returnLoggedInUser(String inpusername, String inppassword) {
-		
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String dbusername = "postgres";
-		String dbpassword = "test";
-		
-		try (
-			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
-			Statement statement = connection.createStatement();
-		) { 
-			String sql ="SELECT * FROM public.users WHERE username='"+inpusername+"' AND password='"+inppassword+"'";
-
-			ResultSet resSet = statement.executeQuery(sql);
-			resSet.next();
-			int id = resSet.getInt("id");
-			String fname = resSet.getString("firstname");
-			String lname = resSet.getString("lastname");
-			String username = resSet.getString("username");
-			String password = resSet.getString("password");
-			int authtype = resSet.getInt("authtype");
-			
-			if(authtype == 3) {
-				Admin currentUser = new Admin(id,fname,lname,username,password,authtype);
-				return currentUser;
-			}else if (authtype ==2){
-				Employees currentUser = new Employees(id,fname,lname,username,password,authtype);
-				return currentUser;
-			}else {
-				users currentUser = new users(id,fname,lname,username,password,authtype);
-				return currentUser;
-			}
-			} catch (SQLException ex) {
-				System.out.println("DB did not work!");
-				System.out.println(ex.getMessage());
-			}
-		return null;
-	}
-
-	public ArrayList<BankAccount> returnBankAccounts(users currentUser) {
-		
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String dbusername = "postgres";
-		String dbpassword = "test";
-		
-		ArrayList<BankAccount> accounts = new ArrayList();
-		try (
-				Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
-				Statement statement = connection.createStatement();
-			) { 
-		String sql = "WITH joinusersbank as(SELECT bankaccountid FROM joinusersbank WHERE userid="+currentUser.id+") SELECT * FROM joinusersbank INNER JOIN bankaccounts ON joinusersbank.bankaccountid = bankaccounts.id";
-		ResultSet resSet = statement.executeQuery(sql);
-		while(resSet.next()) {
-			//System.out.println(resSet.getString("accounttype"));
-			if(resSet.getString("accounttype").equals("Checking")) {
-				CheckingAccount chaccount = new CheckingAccount(resSet.getInt("id"), resSet.getDouble("balance"), resSet.getString("accounttype"), resSet.getInt("accountstatus"));
-				accounts.add(chaccount);
-			}else {
-				JointAccount joiaccount = new JointAccount(resSet.getInt("id"), resSet.getDouble("balance"), resSet.getString("accounttype"), resSet.getInt("accountstatus"));
-				accounts.add(joiaccount);
-			}
+		if(success) {
+			System.out.println("Account created sucessfully, pending approval");
+		}else {
+			System.out.println("Account creation failed please restart application");
 		}
-		return accounts;
-	} catch (SQLException ex) {
-		System.out.println("DB did not work initializing bank accounts!");
-		System.out.println(ex.getMessage());
 	}
-		return accounts;
-}
-	
+
+	public Users returnLoggedInUser(String inpusername, String inppassword) {
+		UserTableDao utd = new UserTableDao();
+		Users user = utd.getUser(inpusername, inppassword);
+		if(user != null) {
+			return user;
+		}else {
+			return null;
+		}
+	}
+
+	public ArrayList<BankAccount> returnBankAccounts(Users currentUser) {
+		ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
+		BankTableDao btd = new BankTableDao();
+		return btd.getUserBankAccounts(currentUser);
+	}
 	
 	public static int ensureScannerInt(Scanner input, int max, int min) {
 		int choice = -1 ; 
 		int choiceMax = max-1;
-		//System.out.println("MAX: "+max+" Choice Max:"+choiceMax);
+
 		while(choice==-1) {
             try {         
                System.out.print("Your choice:");

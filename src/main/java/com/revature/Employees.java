@@ -1,6 +1,6 @@
 package com.revature;
 
-public class Employees extends users{
+public class Employees extends Users{
 
 	public int id;
 	public String firstname;

@@ -27,5 +27,5 @@ abstract class BankAccount implements Withdrawable, Depositable, Transferable{
 
 	public abstract void setAccountstatus(int accountstatus);
 	
-	public void addUserToAccount(int id) {}
+	public boolean addUserToAccount(Users currentUser,int id) {return false;}
 }

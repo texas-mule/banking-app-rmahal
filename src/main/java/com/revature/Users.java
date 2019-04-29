@@ -1,6 +1,6 @@
 package com.revature;
 
-public class users {
+public class Users {
 	
 	
 	public int id;
@@ -10,7 +10,7 @@ public class users {
 	public String password;
 	public int authtype;
 	
-	users(int id, String firstname, String lastname, String username, String password, int authtype){
+	Users(int id, String firstname, String lastname, String username, String password, int authtype){
 		this.id = id;
 		this.firstname = firstname;
 		this.lastname = lastname;
