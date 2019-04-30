@@ -1,23 +1,18 @@
 package com.revature;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class AdminLogin {
-	
+
 	Admin admin;
-	
+
 	AdminLogin(Users currentUser){
 		this.admin = (Admin) currentUser;
 	}
-	
+
 	public void welcome() {
-		
+
 		//Approve and Deny accounts
 		System.out.println("Welcome Admin "+admin.firstname+" "+admin.lastname);
 		Scanner input = new Scanner(System.in);
@@ -27,7 +22,6 @@ public class AdminLogin {
 			System.out.println("Press 0 to log out....");
 			System.out.println("Press 1 to interact with users and their accounts...");
 			System.out.println("Press 2 to interact with bank accounts...");
-			System.out.print("Please pick option: ");
 			int choice = ensureScannerInt(input, 3, 0);
 			if(choice == 0) {
 				run = false;
@@ -41,13 +35,10 @@ public class AdminLogin {
 				run = false;
 				break;
 			}
-			
-			
 		}
-		
 	}
-	
-	
+
+
 	public void userChoice(Users currentUser) {
 		boolean run = true;
 		Scanner input = new Scanner(System.in);
@@ -55,8 +46,8 @@ public class AdminLogin {
 			System.out.println("What would you like to do?");
 			System.out.println("Press 0 to go back.");
 			System.out.println("Press 1 to see all user accounts.");
-			System.out.println("Press 2 to edit a users accounts.");
-			System.out.print("Please pick option: ");
+			System.out.println("Press 2 to edit a user accounts.");
+			//System.out.print("Please pick option: ");
 			int choice = ensureScannerInt(input, 3, 0);
 			if(choice == 0) {
 				run=false;
@@ -64,7 +55,7 @@ public class AdminLogin {
 			}else if(choice == 1) {
 				System.out.println("All Users:");
 				this.viewAllUserAccounts();
-				System.out.println("==============");
+				System.out.println("===========================");
 			}else if(choice == 2) {
 				System.out.println("All Bank Accounts:");
 				this.editUserAccounts();
@@ -73,26 +64,27 @@ public class AdminLogin {
 				System.out.println("==============");
 			}
 		}
-	
-		
-		
-		
-		
+
+
+
+
+
 	}
-	
+
 	public void accountChoice() {
-		
+
 	}
-	
-	
+
+
 	private void viewAllUserAccounts() {
-		
+		UserTableDao utd = new UserTableDao();
+		utd.printAllUsers();
 	}
-	
+
 	private void editUserAccounts() {
-		
+
 	}
-	
+
 	private void viewAllBankAccounts(Users currentUser) {
 		boolean run = true;
 		Scanner input = new Scanner(System.in);
@@ -100,101 +92,336 @@ public class AdminLogin {
 			System.out.println("What would you like to do?");
 			System.out.println("Press 0 to go back.");
 			System.out.println("Press 1 to see all bank accounts.");
-			System.out.println("Press 2 to access and edit a bank accounts.");
+			System.out.println("Press 2 to access and edit a bank account.");
 			System.out.println("Press 3 to change status of account.");
 			System.out.println("Press 4 cancel an account.");
-			System.out.print("Please pick option: ");
 			int choice = ensureScannerInt(input, 5, 0);
 			if(choice == 0) {
 				run=false;
 				break;
 			}else if(choice == 1) {
 				System.out.println("All Accounts:");
-				ArrayList<BankAccount> accountsString = this.getAllBankAccounts();
-				int i =0;
-				System.out.println("Firstname\tLastname\tBankID\tType\t\tBalance\tStatus");
-				while(i<accountsString.size()) {
-					System.out.println(accountsString.get(i));
-					i++;
-				}
+				this.viewAllAccounts();
 				System.out.println("==============");
 			}else if(choice == 2) {
-				System.out.println("Pick the account id you wish to access:");
-				this.editUserAccounts();
+				int bankRowCounts = this.returnBankAccountRowCount();
+				this.accessBankAccount(input, bankRowCounts);
 				System.out.println("==============");
 			}else if(choice == 3) {
 				System.out.println("Change the status:");
-				this.editUserAccounts();
+				this.editBankStatus();
 				System.out.println("==============");
 			}else if(choice == 4) {
-				System.out.println("All Bank Accounts:");
-				this.editUserAccounts();
+				System.out.println("Cancel account:");
+				this.cancelBankAccount();
 				System.out.println("==============");
 			}else{
 				System.out.println("==============");
 			}
 		}
 	}
-	
-	private ArrayList<BankAccount> getAllBankAccounts() {
-		//ArrayList<BankAccounts> ba = new ArrayList<BankAccounts>();
-		//String sql="SELECT * FROM joinusersbank LEFT JOIN users ON (users.id = joinusersbank.userid) RIGHT JOIN bankaccounts ON (bankaccounts.id = joinusersbank.bankaccountid)";
+
+	private void cancelBankAccount() {
+		ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
+		accounts = returnAllBankAccounts();
+		Scanner input = new Scanner(System.in);
+
+		int i=0;
+		while(i<accounts.size()) {
+			System.out.println(accounts.get(i).getId()+"\t"+accounts.get(i).getBalance()+"\t"+accounts.get(i).getType()+"\t"+accounts.get(i).getAccountstatus());
+			i++;
+		}
+		boolean run = true;
+		CheckingAccount ca = null;
+		JointAccount ja = null;
+		while(run) {
+			accounts = returnAllBankAccounts();
+			System.out.println("Select account to cancel by their id... press 0 to back out");
+			int max =returnBankAccountRowCount();
+			int choice = ensureScannerInt(input, max+1, 0);
+			if(choice == 0) {
+				run = false;
+				break;
+			}else {
+				i=0;
+				while(i<accounts.size()) {
+					if(accounts.get(i).getId() == choice) {
+						if(accounts.get(i).getType().equals("Checking")){
+							ca = new CheckingAccount(accounts.get(i).getId(),accounts.get(i).getBalance(), accounts.get(i).getType(), accounts.get(i).getAccountstatus());
+							break;
+						}else {
+							ja = new JointAccount(accounts.get(i).getId(),accounts.get(i).getBalance(), accounts.get(i).getType(), accounts.get(i).getAccountstatus());
+							break;
+						}
+					}
+					i++;
+				}
+				if(ja == null && ca == null) {
+					System.out.println("Invalid choice backing out.");
+					break;
+				}else {
+					if(ca != null) {
+						ca.setAccountstatus(4);
+						saveTranstion(ca);
+						break;
+					}else {
+						ja.setAccountstatus(4);
+						saveTranstion(ja);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	private void accessBankAccount(Scanner input, int bankRowCounts) {
+		System.out.println("Please enter id of account you wish to access");
+		System.out.print("Your choice: ");
+		int choice = ensureScannerInt(input, bankRowCounts+1,1);
+
+		ArrayList<BankAccount> bankaccount = new ArrayList<BankAccount>();
+		BankTableDao btd = new BankTableDao();
+		bankaccount.add(btd.getAccount(choice));
+		CheckingAccount ckaccount = null;
+		JointAccount joiaccount = null;
+		if(bankaccount.get(0).getType().equals("Checking")) {
+			ckaccount = new CheckingAccount(bankaccount.get(0).getId(),bankaccount.get(0).getBalance(),bankaccount.get(0).getType(),bankaccount.get(0).getAccountstatus());
+		}else {
+			joiaccount = new JointAccount(bankaccount.get(0).getId(),bankaccount.get(0).getBalance(),bankaccount.get(0).getType(),bankaccount.get(0).getAccountstatus());
+		}
+		if(ckaccount != null) {
+			this.singleAccountOptions(this.admin, ckaccount, bankRowCounts);
+		}else {
+			this.singleAccountOptions(this.admin, joiaccount, bankRowCounts);
+		}
+	}
+
+	protected ArrayList<BankAccount> returnAllBankAccounts() {
 		BankTableDao btd = new BankTableDao();
 		return btd.getAllAccounts();
 	}
-	
-	
-	private ArrayList<String> getAllBankAccountsAndUserInfo() {
-		//ArrayList<BankAccounts> ba = new ArrayList<BankAccounts>();
-		//String sql="SELECT * FROM joinusersbank LEFT JOIN users ON (users.id = joinusersbank.userid) RIGHT JOIN bankaccounts ON (bankaccounts.id = joinusersbank.bankaccountid)";
+
+	protected void saveTranstion(BankAccount ba) {
 		BankTableDao btd = new BankTableDao();
-		//return btd.getAllAccounts();
-		return null;
+		boolean success = btd.updateAccount(ba);
+		if(success) {
+			System.out.println("Transaction Complete!");
+		}else {
+			System.out.println("Transaction failed please try again!");
+		}
+	} 
+
+	private void editBankStatus() {
+		ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
+		accounts = returnAllBankAccounts();
+		Scanner input = new Scanner(System.in);
+
+		int i=0;
+		while(i<accounts.size()) {
+			System.out.println(accounts.get(i).getId()+"\t"+accounts.get(i).getBalance()+"\t"+accounts.get(i).getType()+"\t"+accounts.get(i).getAccountstatus());
+			i++;
+		}
+		boolean run = true;
+		CheckingAccount ca = null;
+		JointAccount ja = null;
+		while(run) {
+			accounts = returnAllBankAccounts();
+			System.out.println("Select account to update by their id... press 0 to back out");
+			int max =returnBankAccountRowCount();
+			int choice = ensureScannerInt(input, max+1, 0);
+			if(choice == 0) {
+				run = false;
+				break;
+			}else {
+				i=0;
+				while(i<accounts.size()) {
+					if(accounts.get(i).getId() == choice) {
+						if(accounts.get(i).getType().equals("Checking")){
+							ca = new CheckingAccount(accounts.get(i).getId(),accounts.get(i).getBalance(), accounts.get(i).getType(), accounts.get(i).getAccountstatus());
+							break;
+						}else {
+							ja = new JointAccount(accounts.get(i).getId(),accounts.get(i).getBalance(), accounts.get(i).getType(), accounts.get(i).getAccountstatus());
+							break;
+						}
+					}
+					i++;
+				}
+				if(ja == null && ca == null) {
+					System.out.println("Invalid choice backing out.");
+					break;
+				}else {
+					System.out.println("Select 1 to approve account.");
+					System.out.println("Select 2 to put account on pending.");
+					System.out.println("Select 3 to deny account.");
+					int status = ensureScannerInt(input, 4, 1);
+					if(status == 1) {
+						if(ca != null) {
+							ca.setAccountstatus(1);
+							saveTranstion(ca);
+							break;
+						}else {
+							ja.setAccountstatus(1);
+							saveTranstion(ja);
+							break;
+						}
+					}else if(status == 2) {
+						if(ca != null) {
+							ca.setAccountstatus(2);
+							saveTranstion(ca);
+							break;
+						}else {
+							ja.setAccountstatus(2);
+							saveTranstion(ja);
+							break;
+						}
+					}else if(status == 3) {
+						if(ca != null) {
+							ca.setAccountstatus(3);
+							saveTranstion(ca);
+							break;
+						}else {
+							ja.setAccountstatus(3);
+							saveTranstion(ja);
+							break;
+						}
+					}else {
+						System.out.println("Invalid option please try again later.");
+						break;
+					}
+				}
+			}
+		}
 	}
-	
-	
-	public static int ensureScannerInt(Scanner input, int max, int min) {
+
+	private void singleAccountOptions(Users currentUser,BankAccount account, int row) {
+		System.out.println("BANK ACCOUNT # "+account.getId());
+		Scanner input = new Scanner(System.in);
+		boolean run=true;
+		if(account.getType().equals("Checking")) {
+			//Check account
+			while(run) {
+				System.out.println("What transaction would you like to do?");
+				System.out.println("Press 0 to return...");
+				System.out.println("Press 1 to Withdraw...");
+				System.out.println("Press 2 to Deposit...");
+				System.out.println("Press 3 to Transfer...");
+				int choice = ensureScannerInt(input, 4, 0);
+				if(choice == 1) {
+					System.out.println("How much would you like to withdraw?");
+					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					account.Withdraw(amount);
+				}else if(choice == 2) {
+					System.out.println("How much would you like to deposit?");
+					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					account.Deposit(amount);
+				}else if(choice == 3) {
+					System.out.println("How much would you like to transfer?");
+					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					System.out.println("Where would you like to transfer it too?");
+					int where = ensureScannerInt(input, row+1, 1);
+					if(where == account.getId()) {
+						System.out.println("Nice Try... transferer and transferee cannot be the same account.");
+					}else {
+						account.Transfer(where, amount);
+					}
+				}else {
+					run = false;
+					break;
+				}
+			}
+		}else {
+			//Joint account
+			while(run) {
+				System.out.println("What transaction would you like to do?");
+				System.out.println("Press 0 to return...");
+				System.out.println("Press 1 to Withdraw...");
+				System.out.println("Press 2 to Deposit...");
+				System.out.println("Press 3 to Transfer...");
+				System.out.println("Press 4 to add another user to the account...");
+				int choice = ensureScannerInt(input, 5, 0);
+				if(choice == 1) {
+					System.out.println("How much would you like to withdraw?");
+					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					account.Withdraw(amount);
+				}else if(choice == 2) {
+					System.out.println("How much would you like to deposit?");
+					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					account.Deposit(amount);
+				}else if(choice == 3) {
+					System.out.println("How much would you like to transfer?");
+					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					System.out.println("Where would you like to transfer it too?");
+					int where = ensureScannerInt(input, row+1, 1);
+					account.Transfer(where, amount);
+				}else if(choice == 4) {
+					System.out.println("Please enter id of person you wish to add to the account!");
+					int where = ensureScannerInt(input, row+1, 1);
+					boolean response = account.addUserToAccount(currentUser, where);
+					if(response) {
+						System.out.println("Successful in adding user!");
+					}else {
+						System.out.println("Successful in adding user!");
+					}
+				}else {
+					run = false;
+					break;
+				}
+			}	
+		}
+
+	}
+
+	private void viewAllAccounts() {
+		BankTableDao btd = new BankTableDao();
+		btd.printAllBankAccountsWithNamesView();
+	}
+
+	private int ensureScannerInt(Scanner input, int max, int min) {
 		int choice = -1 ; 
 		int choiceMax = max-1;
 		while(choice==-1) {
-            try {         
-               System.out.print("Your choice:");
- 	           choice = input.nextInt();
-	           if(choice>choiceMax || choice<min){
-	                System.out.println("Invalid Input try again,");
-	        	   choice=-1;
-	           }
-            }catch(Exception e) {
-                input.next();
-                System.out.println("Invalid input please try again,");
-                	System.out.print("Your choice:");
-                choice=-1;
-            }
-        }
+			try {         
+				System.out.print("Your choice: ");
+				choice = input.nextInt();
+				if(choice>choiceMax || choice<min){
+					System.out.println("Invalid Input try again,");
+					choice=-1;
+				}
+			}catch(Exception e) {
+				input.next();
+				System.out.println("Invalid input please try again,");
+				System.out.print("Your choice: ");
+				choice=-1;
+			}
+		}
 		return choice;
 	}
-	
-	
-	
-	
-	public static int returnBankAccountRowCount() {
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String username = "postgres";
-		String password = "test";	
-		try (
-			Connection connection = DriverManager.getConnection(url,username,password);
-			Statement statement = connection.createStatement();
-		) {   // executeUpdate() returns the number of rows affected for DML
-			ResultSet resSet = statement.executeQuery("SELECT COUNT(*) AS rowcount FROM bankaccounts");
-			resSet.next();
-			int count = resSet.getInt("rowcount");
-			resSet.close();
-			return count;
-				
-			} catch (SQLException ex) {
-				System.out.println("DB did not work!");
-				System.out.println(ex.getMessage());
-				return 0;
+
+	public static int ensureBalanceScannerInt(Scanner input, int max, int min) {
+		int choice = -1;
+		while(choice==-1) {
+			try {         
+				System.out.print("Your choice: ");
+				choice = input.nextInt();
+				if(choice<min){
+					System.out.println("Input too low try again...");
+					choice=-1;
+				}else if(choice > max) {
+					System.out.println("Please be a little more realistic....");
+					choice=-1;
+				}
+			}catch(Exception e) {
+				input.next();
+				System.out.println("Invalid input please try again,");
+				choice=-1;
 			}
+		}
+		return choice;
+	}
+
+
+	private int returnBankAccountRowCount() {
+		BankTableDao btd = new BankTableDao();
+		return btd.returnRowCount();
 	}
 }

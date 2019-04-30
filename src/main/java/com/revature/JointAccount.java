@@ -113,7 +113,7 @@ public class JointAccount extends BankAccount implements Withdrawable, Depositab
 		BankTableDao btd = new BankTableDao();
 		boolean success = btd.TransferBetweenAccounts(accounts, amount);
 		if(success) {
-			System.out.println("Transfering funds from account #"+accounts.get(0).getId()+" to account #"+accounts.get(1)+" was completed." );
+			System.out.println("Transfering funds from account #"+accounts.get(0).getId()+" to account #"+accounts.get(1).getId()+" was completed." );
 		}else {
 			System.out.println("There was an error trying to transfer please try again later!");
 		}

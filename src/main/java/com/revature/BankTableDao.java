@@ -291,9 +291,9 @@ public class BankTableDao implements BankDao{
 			System.out.println("ID\tAccountType\t\tBalance\t\tAccountStatus");
 			while(resSet.next()) {
 				if(resSet.getString("accounttype").equals("Joint")) {
-					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("accounttype")+"\t\t\t"+resSet.getDouble("balance")+"\t\t"+resSet.getInt("accountstatus"));
+					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("accounttype")+"\t\t\t"+resSet.getDouble("balance")+"\t\t\t"+resSet.getInt("accountstatus"));
 				}else {
-					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("accounttype")+"\t\t"+resSet.getDouble("balance")+"\t\t"+resSet.getInt("accountstatus"));
+					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("accounttype")+"\t\t"+resSet.getDouble("balance")+"\t\t\t"+resSet.getInt("accountstatus"));
 				}
 			}
 			connection.close();
@@ -307,7 +307,6 @@ public class BankTableDao implements BankDao{
 
 	@Override
 	public void printAllBankAccounts() {
-
 		try (
 				Connection connection = ConnectionFactory.getConnection();
 				Statement statement = connection.createStatement();
@@ -317,9 +316,9 @@ public class BankTableDao implements BankDao{
 			System.out.println("ID\tAccountType\t\tBalance\tAccountStatus");
 			while(resSet.next()) {
 				if(resSet.getString("accounttype").equals("Joint")) {
-					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("accounttype")+"\t\t\t"+resSet.getDouble("balance")+"\t\t"+resSet.getInt("accountstatus"));
+					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("accounttype")+"\t\t\t$"+String.format("%.2f",resSet.getDouble("balance"))+"\t\t\t"+resSet.getInt("accountstatus"));
 				}else {
-					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("accounttype")+"\t\t"+resSet.getDouble("balance")+"\t\t"+resSet.getInt("accountstatus"));
+					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("accounttype")+"\t\t$"+String.format("%.2f",resSet.getDouble("balance"))+"\t\t\t"+resSet.getInt("accountstatus"));
 				}
 			}
 			connection.close();
@@ -329,5 +328,31 @@ public class BankTableDao implements BankDao{
 		}
 	}
 
+
+	@Override
+	public void printAllBankAccountsWithNamesView() {
+		try (
+				Connection connection = ConnectionFactory.getConnection();
+				Statement statement = connection.createStatement();
+				) { 
+			String sql="SELECT * FROM joinusersbank LEFT JOIN users ON (users.id = joinusersbank.userid) RIGHT JOIN bankaccounts ON (bankaccounts.id = joinusersbank.bankaccountid)";
+			ResultSet resSet = statement.executeQuery(sql);
+			System.out.println("FirstName\tLastName\tID\tAccountType\t\tBalance\t\t\tAccountStatus");
+			while(resSet.next()) {
+				if(resSet.getString("accounttype").equals("Joint")) {
+					System.out.println(resSet.getString("FirstName")+"\t\t"+resSet.getString("lastname")+"\t\t"+resSet.getInt("bankaccountid")+"\t"+resSet.getString("accounttype")+"\t\t\t$"+String.format("%.2f",resSet.getDouble("balance"))+"\t\t\t"+resSet.getInt("accountstatus"));
+				}else {
+					System.out.println(resSet.getString("FirstName")+"\t\t"+resSet.getString("lastname")+"\t\t"+resSet.getInt("bankaccountid")+"\t"+resSet.getString("accounttype")+"\t\t$"+String.format("%.2f",resSet.getDouble("balance"))+"\t\t\t"+resSet.getInt("accountstatus"));
+				}
+			}
+			connection.close();
+		} catch (SQLException ex) {
+			System.out.println("DB did not work initializing bank accounts!");
+			System.out.println(ex.getMessage());
+		}
+		
+	}
+
 }
+
 

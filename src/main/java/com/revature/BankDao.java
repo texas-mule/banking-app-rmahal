@@ -10,6 +10,7 @@ public interface BankDao {
     ArrayList<BankAccount> getActiveBankAccounts();
     ArrayList<BankAccount> getPendingBankAccounts();
     void printAllBankAccounts();
+    void printAllBankAccountsWithNamesView();
     void printPendingBankAccounts();
     ArrayList<BankAccount> getCanceledDeniedBankAccounts();
     boolean TransferBetweenAccounts(ArrayList<BankAccount> accounts, double amount);

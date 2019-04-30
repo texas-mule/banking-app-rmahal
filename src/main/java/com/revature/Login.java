@@ -137,7 +137,6 @@ public class Login {
 						System.out.println("Applied for new Joint Account.");
 						saveNewBankAccount(currentUser, row, "Joint", 0, 2);
 						row++;
-						System.out.println("NEED TO SET UP OTHER USER FOR JOINT ACCOUNT");
 					}	
 				}else if(option == 3) {
 					System.out.println("Please enter id of account you wish to access");
@@ -302,7 +301,7 @@ public class Login {
 
 		while(choice==-1) {
             try {         
-               System.out.print("Your choice:");
+               System.out.print("Your choice: ");
  	           choice = input.nextInt();
 	           if(choice>choiceMax || choice<min){
 	                System.out.println("Invalid Input try again,");
@@ -310,7 +309,7 @@ public class Login {
 	           }
             }catch(Exception e) {
                 input.next();
-                System.out.println("Sorry wrong input");
+                System.out.println("Invalid Input try again,");
                 choice=-1;
             }
         }
@@ -356,12 +355,6 @@ public class Login {
             }
         }
 		return choice;
-	}
-	
-	
-	
-	
-	
-		
+	}	
 }
 
