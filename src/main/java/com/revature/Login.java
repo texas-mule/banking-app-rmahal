@@ -1,11 +1,6 @@
 package com.revature;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -25,6 +20,7 @@ public class Login {
 				login(bankRowCounts);
 			}else if(option == 2) {
 				createAccount(userRowCounts);
+				userRowCounts++;
 			}else if(option == 0){
 				run = false;
 				break;
@@ -32,8 +28,6 @@ public class Login {
 				System.out.println("Incorrect option!");
 				break;
 			}
-			run = false;
-			input.close();
 		}
 	}
 
@@ -55,26 +49,17 @@ public class Login {
 		System.out.println("Account created successfully!");
 		System.out.println("Please Try Logging In.....");
 		row++;
-		login(row);
 	}
 
 	public void saveAccount(int row, String fname, String lname, String username, String password, int authtype) {
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String dbusername = "postgres";
-		String dbpassword = "test";
-		
-		try (
-			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
-			Statement statement = connection.createStatement();
-		) { 
-			String sql = "INSERT INTO public.users( id, firstname, lastname, username, password, authtype) VALUES ("+row+", '"+fname+"', '"+lname+"', '"+username+"', '"+password+"', "+authtype+")";
-			ResultSet resSet = statement.executeQuery(sql);
-			resSet.close();
-				
-			} catch (SQLException ex) {
-				System.out.println("DB did not work saving user account!");
-				System.out.println(ex.getMessage());
-			}
+		Users user = new Users(row, fname, lname,username, password, authtype);
+		UserTableDao utd = new UserTableDao();
+		boolean success = utd.insertUser(row, user);
+		if(success) {
+			System.out.println("User successfully added!");
+		}else {
+			System.out.println("Error in adding user, please !");
+		}
 	}
 
 	public void login(int bankRowCounts) throws IOException{
@@ -90,9 +75,7 @@ public class Login {
 		boolean exists = utd.getIfUserExists(username, password);//PINNED
 		if(exists) {
 			Users currentUser = returnLoggedInUser(username,password);
-			System.out.println("AuthType");
-			System.out.println(currentUser.authtype);
-			System.out.println("USER LOGIN WAS A SUCCESS!");
+			System.out.println("====================");
 			successLogin(currentUser, bankRowCounts);
 		}else {
 			System.out.println("COULD NOT VERIFY PLEASE START OVER!");
@@ -112,7 +95,8 @@ public class Login {
 			EmployeeLogin emplogin = new EmployeeLogin(currentUser);
 			emplogin.welcome();
 			
-		}else {
+		}else if(currentUser.authtype == 1) {
+			System.out.println("Welcome user "+currentUser.firstname+" "+currentUser.lastname+"!");
 			int row = bankRowCounts;
 			ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 			boolean run = true;
@@ -194,6 +178,9 @@ public class Login {
 					break;
 				}
 			}
+		}else {
+			
+			System.out.println("Invalid account please try again later.");
 		}
 	}
 
@@ -223,7 +210,11 @@ public class Login {
 					int amount = ensureBalanceScannerInt(input, 1000000, 0);
 					System.out.println("Where would you like to transfer it too?");
 					int where = ensureScannerInt(input, row+1, 1);
-					account.Transfer(where, amount);
+					if(where == account.getId()) {
+						System.out.println("Nice Try... transferer and transferee cannot be the same account.");
+					}else {
+						account.Transfer(where, amount);
+					}
 				}else {
 					run = false;
 					break;
@@ -260,7 +251,7 @@ public class Login {
 					if(response) {
 						System.out.println("Successful in adding user!");
 					}else {
-						System.out.println("Error in adding user please try again!");
+						System.out.println("Successful in adding user!");
 					}
 				}else {
 					run = false;
@@ -301,7 +292,6 @@ public class Login {
 	}
 
 	public ArrayList<BankAccount> returnBankAccounts(Users currentUser) {
-		ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 		BankTableDao btd = new BankTableDao();
 		return btd.getUserBankAccounts(currentUser);
 	}
@@ -347,8 +337,7 @@ public class Login {
 	}
 	
 	public static int ensureBalanceScannerInt(Scanner input, int max, int min) {
-		int choice = -1 ; 
-		int choiceMax = max-1;
+		int choice = -1;
 		while(choice==-1) {
             try {         
                System.out.print("Your choice:");

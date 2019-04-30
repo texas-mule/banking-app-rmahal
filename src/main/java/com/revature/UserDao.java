@@ -1,13 +1,17 @@
 package com.revature;
 
-import java.util.Set;
+
+import java.util.ArrayList;
+
 
 public interface UserDao {
     Users getUser(String username, String password);
-    Set<Users> getAllUsers();
+    ArrayList<Users> getAllUsers();
+    void printAllUsers();
     boolean getIfUserExists(String username, String password);
-    boolean insertUser();
-    boolean updateUser();
-    boolean deleteUser();
+    boolean insertUser(int row, Users user);
+    boolean updateUser(Users user);
+    boolean deleteUser(Users user);
     boolean authUser(String username, String password);
+    int returnUserRowCount();
 }

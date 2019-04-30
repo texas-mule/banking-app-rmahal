@@ -1,10 +1,5 @@
 package com.revature;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 public class CheckingAccount extends BankAccount implements Withdrawable, Depositable, Transferable{
@@ -64,14 +59,12 @@ public class CheckingAccount extends BankAccount implements Withdrawable, Deposi
 	//Method to check balance of account
 	@Override
 	public void checkBalance() {
-		// TODO Auto-generated method stub
 		System.out.println("Your balance is: $"+this.balance);
 	}
 	
 	
 	//Method to withdraw money from their bank account
 	public void Withdraw(int amount) {
-		// TODO Auto-generated method stub
 		if(amount < balance && amount > 0) {
 		this.balance = this.balance-amount;
 		saveTranstion();
@@ -106,87 +99,33 @@ public class CheckingAccount extends BankAccount implements Withdrawable, Deposi
 			this.readyForTransfer(accounts, amount);
 		}
 	}
-	
-	
+		
 	private BankAccount retrieveAccount(int id) {
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String dbusername = "postgres";
-		String dbpassword = "test";
-		CheckingAccount ca =null;
-		JointAccount ja =null;		
-		
-		try (
-				Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
-				Statement statement = connection.createStatement();
-		) { 
-		String sql = "SELECT * FROM bankaccounts WHERE id="+id;
-		//System.out.println(sql);
-		ResultSet resSet = statement.executeQuery(sql);
-		resSet.next();
-		if(resSet.getString("accounttype").equals("Checking")) {
-			ca = new CheckingAccount(resSet.getInt("id"),resSet.getDouble("balance"), resSet.getString("accounttype"), resSet.getInt("accountstatus"));
-		}else {
-			ja = new JointAccount(resSet.getInt("id"),resSet.getDouble("balance"), resSet.getString("accounttype"), resSet.getInt("accountstatus"));
-		}
-		
-		if(ca != null) {
-			return ca;
-		}else {
-			return ja;
-		}
-		
-		} catch (SQLException ex) {
-			System.out.println("DB did not work in saving transaction!");
-			System.out.println(ex.getMessage());
-	}
-		
-		return null;
+		BankTableDao btd = new BankTableDao();
+		return btd.getAccount(id);
 	}
 	
 	
 	private void readyForTransfer(ArrayList<BankAccount> accounts, double amount) {
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String dbusername = "postgres";
-		String dbpassword = "test";
-		double senderBal = accounts.get(0).getBalance()-amount;
-		double recieverBal = accounts.get(1).getBalance()+amount;
-		
-		try (
-				Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
-				Statement statement = connection.createStatement();
-		) { 
-		String sql = "UPDATE public.bankaccounts SET id="+accounts.get(0).getId()+", accounttype='"+accounts.get(0).getType()+"', balance="+senderBal+", accountstatus="+accounts.get(0).getAccountstatus()+" WHERE id="+accounts.get(0).getId()+";"+"UPDATE public.bankaccounts SET id="+accounts.get(1).getId()+", accounttype='"+accounts.get(1).getType()+"', balance="+recieverBal+", accountstatus="+accounts.get(1).getAccountstatus()+" WHERE id="+accounts.get(1).getId()+";";
-		//System.out.println(sql);
-		int resSet = statement.executeUpdate(sql);
-		System.out.println("Transfer Completed!");
-		
-		} catch (SQLException ex) {
-			System.out.println("DB did not work in saving transaction!");
-			System.out.println(ex.getMessage());
-	}
+		BankTableDao btd = new BankTableDao();
+		boolean success = btd.TransferBetweenAccounts(accounts, amount);
+		if(success) {
+			System.out.println("Transfering funds from account #"+accounts.get(0).getId()+" to account #"+accounts.get(1)+" was completed." );
+		}else {
+			System.out.println("There was an error trying to transfer please try again later!");
+		}
 	}
 	
 	
 	
 	private void saveTranstion() {
 		CheckingAccount account = new CheckingAccount(this.id, this.balance, this.type,this.accountstatus);
-
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String dbusername = "postgres";
-		String dbpassword = "test";
-
-		try (
-			Connection connection = DriverManager.getConnection(url,dbusername,dbpassword);
-			Statement statement = connection.createStatement();
-		) { 
-			String sql = "UPDATE public.bankaccounts SET id="+account.getId()+", accounttype='"+account.getType()+"', balance="+account.getBalance()+", accountstatus="+account.accountstatus+" WHERE id="+account.getId();
-			//System.out.println(sql);
-			int resSet = statement.executeUpdate(sql);
-			System.out.println("Transaction Saved!");
-			
-			} catch (SQLException ex) {
-				System.out.println("DB did not work in saving transaction!");
-				System.out.println(ex.getMessage());
+		BankTableDao btd = new BankTableDao();
+		boolean success = btd.updateAccount(account);
+		if(success) {
+			System.out.println("Transaction success!");
+		}else {
+			System.out.println("There was an error with the transaction please try again later.");
 		}
 	} 
 	

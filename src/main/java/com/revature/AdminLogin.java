@@ -18,7 +18,7 @@ public class AdminLogin {
 	
 	public void welcome() {
 		
-		//Approve and Deny accoutns
+		//Approve and Deny accounts
 		System.out.println("Welcome Admin "+admin.firstname+" "+admin.lastname);
 		Scanner input = new Scanner(System.in);
 		boolean run = true;
@@ -110,7 +110,7 @@ public class AdminLogin {
 				break;
 			}else if(choice == 1) {
 				System.out.println("All Accounts:");
-				ArrayList<String> accountsString = this.getAllBankAccountsInfo();
+				ArrayList<BankAccount> accountsString = this.getAllBankAccounts();
 				int i =0;
 				System.out.println("Firstname\tLastname\tBankID\tType\t\tBalance\tStatus");
 				while(i<accountsString.size()) {
@@ -136,31 +136,20 @@ public class AdminLogin {
 		}
 	}
 	
-	private ArrayList getAllBankAccountsInfo() {
+	private ArrayList<BankAccount> getAllBankAccounts() {
 		//ArrayList<BankAccounts> ba = new ArrayList<BankAccounts>();
-		ArrayList<String> accounts = new ArrayList<String>();
-		String sql="SELECT * FROM joinusersbank LEFT JOIN users ON (users.id = joinusersbank.userid) RIGHT JOIN bankaccounts ON (bankaccounts.id = joinusersbank.bankaccountid)";
-		String url  = "jdbc:postgresql://127.0.0.1:8001/postgres";
-		String username = "postgres";
-		String password = "test";	
-		try (
-			Connection connection = DriverManager.getConnection(url,username,password);
-			Statement statement = connection.createStatement();
-		) {   // executeUpdate() returns the number of rows affected for DML
-			ResultSet resSet = statement.executeQuery(sql);
-			String addAccount = "";
-			while(resSet.next()) {
-				addAccount = resSet.getString("firstname")+"\t\t"+resSet.getString("lastname")+"\t\t"+resSet.getInt("id")+"\t"+resSet.getString("accounttype")+"\t"+resSet.getDouble("balance")+"\t"+resSet.getString("accountstatus");
-				accounts.add(addAccount);
-			}
-			resSet.close();
-			return accounts;
-				
-			} catch (SQLException ex) {
-				System.out.println("DB did not work couldn't load bank accounts!");
-				System.out.println(ex.getMessage());
-				return accounts;
-			}
+		//String sql="SELECT * FROM joinusersbank LEFT JOIN users ON (users.id = joinusersbank.userid) RIGHT JOIN bankaccounts ON (bankaccounts.id = joinusersbank.bankaccountid)";
+		BankTableDao btd = new BankTableDao();
+		return btd.getAllAccounts();
+	}
+	
+	
+	private ArrayList<String> getAllBankAccountsAndUserInfo() {
+		//ArrayList<BankAccounts> ba = new ArrayList<BankAccounts>();
+		//String sql="SELECT * FROM joinusersbank LEFT JOIN users ON (users.id = joinusersbank.userid) RIGHT JOIN bankaccounts ON (bankaccounts.id = joinusersbank.bankaccountid)";
+		BankTableDao btd = new BankTableDao();
+		//return btd.getAllAccounts();
+		return null;
 	}
 	
 	

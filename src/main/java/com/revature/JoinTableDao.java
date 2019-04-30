@@ -1,7 +1,6 @@
 package com.revature;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -32,7 +31,7 @@ public class JoinTableDao implements JoinDao{
 				Statement statement = connection.createStatement();
 			) { 
 				String sql = "INSERT INTO public.joinusersbank(userid, bankaccountid) VALUES ("+userid+", "+rowid+");";
-				int resSet = statement.executeUpdate(sql);
+				statement.executeUpdate(sql);
 				System.out.println("Account has been added to this join account!");
 				connection.close();
 				return true;
