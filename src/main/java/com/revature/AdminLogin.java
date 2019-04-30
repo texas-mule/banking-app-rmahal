@@ -58,7 +58,7 @@ public class AdminLogin {
 				System.out.println("===========================");
 			}else if(choice == 2) {
 				System.out.println("All Bank Accounts:");
-				this.editUserAccounts();
+				this.editUserAccount();
 				System.out.println("==============");
 			}else{
 				System.out.println("==============");
@@ -71,18 +71,49 @@ public class AdminLogin {
 
 	}
 
-	public void accountChoice() {
-
-	}
-
 
 	private void viewAllUserAccounts() {
 		UserTableDao utd = new UserTableDao();
-		utd.printAllUsers();
+		utd.printAllUsersFullView();;
 	}
 
-	private void editUserAccounts() {
-
+	public void editUserAccount() {
+		UserTableDao utd = new UserTableDao();
+		utd.printAllUsersFullView();
+		Scanner input = new Scanner(System.in);
+		System.out.println("Select the user you wish to change by id,");
+		int choice = ensureScannerInt(input, this.returnUserAccountRowCount()+1, 1);
+		utd.printOneUser(choice);
+		System.out.print("Please enter the First Name for this user: ");
+		String fname = ensureScannerString(input);	
+		System.out.print("Please enter the Last Name for this user: ");
+		String lname = ensureScannerString(input);
+		System.out.print("Please enter the Username for this user: ");
+		String username = ensureScannerString(input);
+		System.out.println(username);
+		System.out.print("Please enter the password  for this user: ");
+		String password = ensureScannerString(input);
+		System.out.print("Please enter the authtype for this user: ");
+		int auth = ensureScannerInt(input, 4, 1);
+		
+		Users user = new Users(choice,fname,lname,username,password,auth);
+		boolean success = utd.updateUser(user);
+		if(success) {
+			System.out.println("Successfully updated user.");
+		}else {
+			System.out.println("A problem occured please try again later.");
+		}
+	}
+	
+	private void pushUpdatedUserToDAO(UserTableDao utd,int row, String fname, String lname, String username, String password, int authtype) {
+		Users user = new Users(row, fname, lname,username, password, authtype);
+		UserTableDao utdlocal = utd;
+		boolean success = utd.insertUser(row, user);
+		if(success) {
+			System.out.println("User successfully added!");
+		}else {
+			System.out.println("Error in adding user, please !");
+		}
 	}
 
 	private void viewAllBankAccounts(Users currentUser) {
@@ -172,6 +203,26 @@ public class AdminLogin {
 				}
 			}
 		}
+	}
+	
+	
+	public static String ensureScannerString(Scanner input) {
+		String choice = ""; 
+		while(choice.equals("")) {
+            try {         
+ 	           choice = input.nextLine();
+	           if(choice.contains(";") || choice.contains("*") || choice.equals("\n") || choice.equals("") || choice.contains(" ")){
+	                System.out.println("Sorry incorrect input, please try again!");
+	                System.out.print("Your choice: ");
+	        	   choice="";
+	           }
+            }catch(Exception e) {
+                input.next();
+                System.out.println("Sorry improper input...");
+                choice="";
+            }
+        }
+		return choice;
 	}
 
 	private void accessBankAccount(Scanner input, int bankRowCounts) {
@@ -419,6 +470,10 @@ public class AdminLogin {
 		return choice;
 	}
 
+	private int returnUserAccountRowCount() {
+		UserTableDao utd = new UserTableDao();
+		return utd.returnUserRowCount();
+	}
 
 	private int returnBankAccountRowCount() {
 		BankTableDao btd = new BankTableDao();

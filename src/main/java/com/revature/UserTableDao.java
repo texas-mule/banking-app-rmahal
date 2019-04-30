@@ -126,12 +126,27 @@ public class UserTableDao implements UserDao {
 
 	@Override
 	public boolean updateUser(Users user) {
-		return false;
-	}
+		try (
+				Connection connection = ConnectionFactory.getConnection();
+				Statement statement = connection.createStatement();
+				) { 
+			String sql = "UPDATE public.users SET id="+user.getId()+", firstname='"+user.getFirstname()+"', lastname='"+user.getLastname()+"', username='"+user.getUsername()+"', password='"+user.getPassword()+"', authtype='"+user.getAuthtype()+"' WHERE id="+user.getId();
 
-	@Override
-	public boolean deleteUser(Users user) {
-		return false;
+			ResultSet resSet = statement.executeQuery(sql);
+			boolean returned = resSet.next();
+			if(returned) {
+				connection.close();
+				return true;
+			}else {
+				connection.close();
+				return false;
+			}
+
+		} catch (SQLException ex) {
+			System.out.println("DB did not work!");
+			System.out.println(ex.getMessage());
+			return false;
+		}
 	}
 
 
@@ -194,6 +209,68 @@ public class UserTableDao implements UserDao {
 		} catch (SQLException ex) {
 			System.out.println("DB did not work initializing bank accounts!");
 			System.out.println(ex.getMessage());
+		}
+	}
+
+	@Override
+	public void printAllUsersFullView() {
+		try (
+				Connection connection = ConnectionFactory.getConnection();
+				Statement statement = connection.createStatement();
+				) { 
+			String sql = "SELECT * FROM public.users";
+			ResultSet resSet = statement.executeQuery(sql);
+			System.out.println("ID\tFirstName\tLastName\t\tUsername\tPasswords\tAuthType");
+			while(resSet.next()) {
+					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("firstname")+"\t\t\t"+resSet.getString("lastname")+"\t\t"+resSet.getString("username")+"\t\t"+resSet.getString("password")+"\t\t"+resSet.getString("authtype"));
+			}
+			connection.close();
+		} catch (SQLException ex) {
+			System.out.println("DB did not work initializing bank accounts!");
+			System.out.println(ex.getMessage());
+		}
+	}
+
+	@Override
+	public boolean deleteUser(Users user) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	public void printOneUser(int id) {
+		try (
+				Connection connection = ConnectionFactory.getConnection();
+				Statement statement = connection.createStatement();
+				) { 
+			String sql = "SELECT * FROM public.users WHERE id="+id;
+			ResultSet resSet = statement.executeQuery(sql);
+			System.out.println("ID\tFirstName\tLastName\t\tUsername\tPasswords\tAuthType");
+			while(resSet.next()) {
+					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("firstname")+"\t\t\t"+resSet.getString("lastname")+"\t\t"+resSet.getString("username")+"\t\t"+resSet.getString("password")+"\t\t"+resSet.getString("authtype"));
+			}
+			connection.close();
+		} catch (SQLException ex) {
+			System.out.println("DB did not work initializing bank accounts!");
+			System.out.println(ex.getMessage());
+		}
+	}
+
+	public Users getOneUser(int id) {
+		try (
+				Connection connection = ConnectionFactory.getConnection();
+				Statement statement = connection.createStatement();
+				) { 
+			String sql = "SELECT * FROM public.users WHERE id="+id;
+			ResultSet resSet = statement.executeQuery(sql);
+			resSet.next();
+			Users user= new Users(resSet.getInt("id"), resSet.getString("firstname"), resSet.getString("lastname"), resSet.getString("username"), resSet.getString("password"), resSet.getInt("authtype"));
+			connection.close();
+			return user;
+		} catch (SQLException ex) {
+			System.out.println("DB did not work initializing bank accounts!");
+			System.out.println(ex.getMessage());
+			return null;
 		}
 	}
 }
