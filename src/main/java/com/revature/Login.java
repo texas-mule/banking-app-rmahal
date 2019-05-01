@@ -1,6 +1,7 @@
 package com.revature;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -116,9 +117,10 @@ public class Login {
 				if(option == 1) {
 					System.out.println("These are your accounts.");
 					int i = 0;
-					System.out.println("ID\tTYPE\t\tBALANCE\tSTATUS");
+					System.out.println("ID\tTYPE\t\tBALANCE\t\tSTATUS");
+					DecimalFormat df = new DecimalFormat("0.00");
 					while(i<accounts.size()) {
-						System.out.println(accounts.get(i).getId()+"\t"+accounts.get(i).getType()+"\t"+accounts.get(i).getBalance()+"\t"+accounts.get(i).getAccountstatus());
+						System.out.println(accounts.get(i).getId()+"\t"+accounts.get(i).getType()+"\t$"+df.format(accounts.get(i).getBalance())+"\t\t"+accounts.get(i).getAccountstatus());
 						i++;
 					}
 					System.out.println();
@@ -209,21 +211,25 @@ public class Login {
 				int choice = ensureScannerInt(input, 4, 0);
 				if(choice == 1) {
 					System.out.println("How much would you like to withdraw?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
 					account.Withdraw(amount);
+					System.out.println();
+					System.out.println();
 				}else if(choice == 2) {
 					System.out.println("How much would you like to deposit?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
 					account.Deposit(amount);
+					System.out.println();
 				}else if(choice == 3) {
 					System.out.println("How much would you like to transfer?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
 					System.out.println("Where would you like to transfer it too?");
 					int where = ensureScannerInt(input, row+1, 1);
 					if(where == account.getId()) {
 						System.out.println("Nice Try... transferer and transferee cannot be the same account.");
 					}else {
 						account.Transfer(where, amount);
+						System.out.println();
 					}
 				}else {
 					run = false;
@@ -242,15 +248,15 @@ public class Login {
 				int choice = ensureScannerInt(input, 5, 0);
 				if(choice == 1) {
 					System.out.println("How much would you like to withdraw?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
 					account.Withdraw(amount);
 				}else if(choice == 2) {
 					System.out.println("How much would you like to deposit?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
 					account.Deposit(amount);
 				}else if(choice == 3) {
 					System.out.println("How much would you like to transfer?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
 					System.out.println("Where would you like to transfer it too?");
 					int where = ensureScannerInt(input, row+1, 1);
 					account.Transfer(where, amount);
@@ -260,8 +266,10 @@ public class Login {
 					boolean response = account.addUserToAccount(currentUser, where);
 					if(response) {
 						System.out.println("Successful in adding user!");
+						System.out.println();
 					}else {
-						System.out.println("Successful in adding user!");
+						System.out.println("Unsuccessful in adding user please try again later!");
+						System.out.println();
 					}
 				}else {
 					run = false;
@@ -363,12 +371,12 @@ public class Login {
 		return choice;
 	}
 	
-	public static int ensureBalanceScannerInt(Scanner input, int max, int min) {
-		int choice = -1;
+	public static double ensureBalanceScannerDoub(Scanner input, int max, int min) {
+		double choice = -1;
 		while(choice==-1) {
             try {         
-               System.out.print("Your choice:");
- 	           choice = input.nextInt();
+               System.out.print("Your choice: $");
+ 	           choice = input.nextDouble();
         	   System.out.println();
 	           if(choice<min){
 	                System.out.println("Input too low try again...");

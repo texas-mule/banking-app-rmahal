@@ -1,5 +1,5 @@
 package com.revature;
 
 public interface Depositable {
-	public void Deposit(int amount);
+	public void Deposit(double amount);
 }

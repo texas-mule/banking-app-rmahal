@@ -1,5 +1,6 @@
 package com.revature;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -77,8 +78,9 @@ public class EmployeeLogin {
 		Scanner input = new Scanner(System.in);
 
 		int i=0;
+		DecimalFormat df = new DecimalFormat("0.00");
 		while(i<accounts.size()) {
-			System.out.println(accounts.get(i).getId()+"\t"+accounts.get(i).getBalance()+"\t"+accounts.get(i).getType()+"\t"+accounts.get(i).getAccountstatus());
+			System.out.println(accounts.get(i).getId()+"\t"+df.format(accounts.get(i).getBalance())+"\t"+accounts.get(i).getType()+"\t\t"+accounts.get(i).getAccountstatus());
 			i++;
 		}
 		boolean run = true;
@@ -144,7 +146,7 @@ public class EmployeeLogin {
 		int choiceMax = max-1;
 		while(choice==-1) {
 			try {         
-				System.out.print("Your choice:");
+				System.out.print("Your choice: ");
 				choice = input.nextInt();
 				if(choice>choiceMax || choice<min){
 					System.out.println("Invalid Input try again,");
@@ -152,7 +154,7 @@ public class EmployeeLogin {
 				}
 			}catch(Exception e) {
 				input.next();
-				System.out.println("Sorry wrong input");
+				System.out.println("Invalid input please try again,");
 				choice=-1;
 			}
 		}

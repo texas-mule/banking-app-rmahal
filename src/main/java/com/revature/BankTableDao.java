@@ -298,7 +298,7 @@ public class BankTableDao implements BankDao{
 				) { 
 			String sql = "SELECT * FROM public.bankaccounts";
 			ResultSet resSet = statement.executeQuery(sql);
-			System.out.println("ID\tAccountType\t\tBalance\tAccountStatus");
+			System.out.println("ID\tAccountType\t\tBalance\t\t\tAccountStatus");
 			while(resSet.next()) {
 				if(resSet.getString("accounttype").equals("Joint")) {
 					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("accounttype")+"\t\t\t$"+String.format("%.2f",resSet.getDouble("balance"))+"\t\t\t"+resSet.getInt("accountstatus"));
