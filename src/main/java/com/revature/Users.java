@@ -3,12 +3,12 @@ package com.revature;
 public class Users {
 	
 	
-	public int id;
-	public String firstname;
-	public String lastname;
-	public String username;
-	public String password;
-	public int authtype;
+	private int id;
+	private String firstname;
+	private String lastname;
+	private String username;
+	private String password;
+	private int authtype;
 	
 	Users(int id, String firstname, String lastname, String username, String password, int authtype){
 		this.id = id;

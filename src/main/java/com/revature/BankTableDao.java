@@ -41,7 +41,6 @@ public class BankTableDao implements BankDao{
 		}
 	}
 
-
 	public ArrayList<BankAccount> getAllAccounts() {
 
 		ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
@@ -74,7 +73,6 @@ public class BankTableDao implements BankDao{
 		}
 	}
 
-
 	public boolean insertAccount(Users currentUser, int row,BankAccount ba) {
 		try (
 				Connection connection = ConnectionFactory.getConnection();
@@ -94,15 +92,14 @@ public class BankTableDao implements BankDao{
 		}
 	}
 
-
 	public int returnRowCount() {	
 		try (
 				Connection connection = ConnectionFactory.getConnection();
 				Statement statement = connection.createStatement();
 				) {
-			ResultSet resSet = statement.executeQuery("SELECT COUNT(*) AS rowcount FROM bankaccounts");
+			ResultSet resSet = statement.executeQuery("SELECT id FROM bankaccounts WHERE id=(SELECT max(id) FROM bankaccounts)");
 			resSet.next();
-			int count = resSet.getInt("rowcount");
+			int count = resSet.getInt("id");
 			resSet.close();
 			connection.close();
 			return count;
@@ -113,7 +110,6 @@ public class BankTableDao implements BankDao{
 		}
 	}
 
-
 	@Override
 	public ArrayList<BankAccount> getUserBankAccounts(Users currentUser) {
 
@@ -122,7 +118,7 @@ public class BankTableDao implements BankDao{
 				Connection connection = ConnectionFactory.getConnection();
 				Statement statement = connection.createStatement();
 				) { 
-			String sql = "WITH joinusersbank as(SELECT bankaccountid FROM joinusersbank WHERE userid="+currentUser.id+") SELECT * FROM joinusersbank INNER JOIN bankaccounts ON joinusersbank.bankaccountid = bankaccounts.id";
+			String sql = "WITH joinusersbank as(SELECT bankaccountid FROM joinusersbank WHERE userid="+currentUser.getId()+") SELECT * FROM joinusersbank INNER JOIN bankaccounts ON joinusersbank.bankaccountid = bankaccounts.id";
 			ResultSet resSet = statement.executeQuery(sql);
 			while(resSet.next()) {
 				if(resSet.getString("accounttype").equals("Checking")) {
@@ -142,7 +138,6 @@ public class BankTableDao implements BankDao{
 		return accounts;
 	}
 
-
 	public boolean updateAccount(BankAccount ba) {
 		try (
 				Connection connection = ConnectionFactory.getConnection();
@@ -161,8 +156,6 @@ public class BankTableDao implements BankDao{
 					return false;
 			}
 	}
-
-
 
 	public ArrayList<BankAccount> getPendingBankAccounts() {
 
@@ -190,8 +183,6 @@ public class BankTableDao implements BankDao{
 		return accounts;
 	}
 
-
-
 	public ArrayList<BankAccount> getActiveBankAccounts() {
 		ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 		try (
@@ -217,8 +208,6 @@ public class BankTableDao implements BankDao{
 		return accounts;
 	}
 
-
-
 	public ArrayList<BankAccount> getCanceledDeniedBankAccounts() {
 		ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 		try (
@@ -243,8 +232,6 @@ public class BankTableDao implements BankDao{
 	}
 		return accounts;
 	}
-
-
 
 	public boolean TransferBetweenAccounts(ArrayList<BankAccount> accounts, double amount) {
 		double senderBal = accounts.get(0).getBalance()-amount;
@@ -279,7 +266,6 @@ public class BankTableDao implements BankDao{
 		}
 	}
 
-
 	@Override
 	public void printPendingBankAccounts() {
 		try (
@@ -304,7 +290,6 @@ public class BankTableDao implements BankDao{
 		
 	}
 
-
 	@Override
 	public void printAllBankAccounts() {
 		try (
@@ -327,7 +312,6 @@ public class BankTableDao implements BankDao{
 			System.out.println(ex.getMessage());
 		}
 	}
-
 
 	@Override
 	public void printAllBankAccountsWithNamesView() {

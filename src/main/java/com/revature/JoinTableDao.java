@@ -12,7 +12,7 @@ public class JoinTableDao implements JoinDao{
 			Connection connection = ConnectionFactory.getConnection();
 			Statement statement = connection.createStatement();
 		) { 
-			int id = currentUser.id;
+			int id = currentUser.getId();
 			System.out.println("UserID: "+id+" RowID: "+row);
 			String sql = "INSERT INTO public.joinusersbank (userid, bankaccountid) VALUES ("+id+","+row+")";
 			int resSet = statement.executeUpdate(sql);

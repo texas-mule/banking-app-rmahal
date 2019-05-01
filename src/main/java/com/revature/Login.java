@@ -11,9 +11,10 @@ public class Login {
 		int userRowCounts = userRow;
 		int bankRowCounts = bankRow;
 		while (run) {
-			System.out.println("Type 0 at any point to end the program!");
+			System.out.println("Welcome to banking app!");
 			System.out.println("Press 1 to login...");
 			System.out.println("Press 2 to create a new account...");
+			System.out.println();
 			Scanner input = new Scanner(System.in);
 			int option = ensureScannerInt(input, 3, 0);
 			if(option == 1) {
@@ -33,7 +34,9 @@ public class Login {
 
 	public void createAccount(int row) throws IOException {
 		Scanner input = new Scanner(System.in);
+		System.out.println();
 		System.out.println("=====================");
+		System.out.println();
 		System.out.println("Please enter your information for account creation when promped...");
 		System.out.print("Please enter your First Name: ");
 		String fname = ensureScannerString(input);	
@@ -41,14 +44,14 @@ public class Login {
 		String lname = ensureScannerString(input);
 		System.out.print("Please enter your username: ");
 		String username = ensureScannerString(input);
-		System.out.println(username);
+		//System.out.println(username);
 		System.out.print("Please enter your password: ");
 		String password = ensureScannerString(input);
 		int authtype = 1;
 		saveAccount(row, fname, lname, username, password, authtype);
-		System.out.println("Account created successfully!");
-		System.out.println("Please Try Logging In.....");
-		row++;
+		System.out.println("Please Try Logging In Now.....");
+		System.out.println("=================");
+		System.out.println("\n");
 	}
 
 	public void saveAccount(int row, String fname, String lname, String username, String password, int authtype) {
@@ -56,9 +59,9 @@ public class Login {
 		UserTableDao utd = new UserTableDao();
 		boolean success = utd.insertUser(row, user);
 		if(success) {
-			System.out.println("User successfully added!");
+			System.out.println("Account created successfully!");
 		}else {
-			System.out.println("Error in adding user, please !");
+			System.out.println("Error in adding user, please restart app and try again!");
 		}
 	}
 
@@ -88,15 +91,15 @@ public class Login {
 	}
 
 	public void successLogin(Users currentUser, int bankRowCounts) {
-		if (currentUser.authtype == 3) {
+		if (currentUser.getAuthtype() == 3) {
 			AdminLogin adlogin = new AdminLogin(currentUser);
 			adlogin.welcome();
-		}else if(currentUser.authtype == 2) {
+		}else if(currentUser.getAuthtype() == 2) {
 			EmployeeLogin emplogin = new EmployeeLogin(currentUser);
 			emplogin.welcome();
 			
-		}else if(currentUser.authtype == 1) {
-			System.out.println("Welcome user "+currentUser.firstname+" "+currentUser.lastname+"!");
+		}else if(currentUser.getAuthtype() == 1) {
+			System.out.println("Welcome user "+currentUser.getFirstname()+" "+currentUser.getLastname()+"!");
 			int row = bankRowCounts;
 			ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 			boolean run = true;
@@ -140,7 +143,7 @@ public class Login {
 					}	
 				}else if(option == 3) {
 					System.out.println("Please enter id of account you wish to access");
-					System.out.print("Your choice: ");
+					//System.out.print("Your choice: ");
 					int choice = ensureScannerInt(input, bankRowCounts,1);
 					int i = 0;
 					int pick = 0;
@@ -303,6 +306,7 @@ public class Login {
             try {         
                System.out.print("Your choice: ");
  	           choice = input.nextInt();
+        	   System.out.println();
 	           if(choice>choiceMax || choice<min){
 	                System.out.println("Invalid Input try again,");
 	        	   choice=-1;
@@ -321,10 +325,12 @@ public class Login {
 		while(choice.equals("")) {
             try {         
  	           choice = input.nextLine();
+        	   System.out.println();
 	           if(choice.contains(";") || choice.contains("*") || choice.equals("\n") || choice.equals("") || choice.contains(" ")){
 	                System.out.println("Sorry incorrect input, please try again!");
 	                System.out.print("Your choice: ");
 	        	   choice="";
+	        	   System.out.println();
 	           }
             }catch(Exception e) {
                 input.next();
@@ -341,6 +347,7 @@ public class Login {
             try {         
                System.out.print("Your choice:");
  	           choice = input.nextInt();
+        	   System.out.println();
 	           if(choice<min){
 	                System.out.println("Input too low try again...");
 	        	   choice=-1;
@@ -350,7 +357,7 @@ public class Login {
 	           }
             }catch(Exception e) {
                 input.next();
-                System.out.println("Invalid input");
+                System.out.println("Invalid input please try again,");
                 choice=-1;
             }
         }

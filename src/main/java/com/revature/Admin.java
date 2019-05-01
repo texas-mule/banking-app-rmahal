@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 public class Admin extends Employees{
 
-	public int id;
-	public String firstname;
-	public String lastname;
-	public String username;
-	public String password;
-	public int authtype;
+	private int id;
+	private String firstname;
+	private String lastname;
+	private String username;
+	private String password;
+	private int authtype;
 
 	Admin(int id, String firstname, String lastname, String username, String password, int authtype){
 		super(authtype, password, password, password, password, authtype);

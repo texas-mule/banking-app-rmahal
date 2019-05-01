@@ -142,7 +142,7 @@ public class JointAccount extends BankAccount implements Withdrawable, Depositab
 	@Override
 	public boolean addUserToAccount(Users currentUser,int id) {
 		boolean success = false;
-		if(currentUser.id == id) {
+		if(currentUser.getId() == id) {
 			System.out.println("Cannot add yourself to the account please try again.");
 			return false;
 		}else {

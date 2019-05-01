@@ -14,7 +14,7 @@ public class AdminLogin {
 	public void welcome() {
 
 		//Approve and Deny accounts
-		System.out.println("Welcome Admin "+admin.firstname+" "+admin.lastname);
+		System.out.println("Welcome Admin "+admin.getFirstname()+" "+admin.getLastname());
 		Scanner input = new Scanner(System.in);
 		boolean run = true;
 		while(run) {
@@ -105,16 +105,15 @@ public class AdminLogin {
 		}
 	}
 	
-	private void pushUpdatedUserToDAO(UserTableDao utd,int row, String fname, String lname, String username, String password, int authtype) {
-		Users user = new Users(row, fname, lname,username, password, authtype);
-		UserTableDao utdlocal = utd;
-		boolean success = utd.insertUser(row, user);
-		if(success) {
-			System.out.println("User successfully added!");
-		}else {
-			System.out.println("Error in adding user, please !");
-		}
-	}
+//	private void pushUpdatedUserToDAO(UserTableDao utd,int row, String fname, String lname, String username, String password, int authtype) {
+//		Users user = new Users(row, fname, lname,username, password, authtype);
+//		boolean success = utd.insertUser(row, user);
+//		if(success) {
+//			System.out.println("User successfully added!");
+//		}else {
+//			System.out.println("Error in adding user, please !");
+//		}
+//	}
 
 	private void viewAllBankAccounts(Users currentUser) {
 		boolean run = true;
@@ -208,10 +207,10 @@ public class AdminLogin {
 	
 	public static String ensureScannerString(Scanner input) {
 		String choice = ""; 
-		while(choice.equals("")) {
+		while(choice.equals("") || choice.equals(null)) {
             try {         
  	           choice = input.nextLine();
-	           if(choice.contains(";") || choice.contains("*") || choice.equals("\n") || choice.equals("") || choice.contains(" ")){
+	           if(choice.contains(";") || choice.contains("*") || choice.equals("\n") || choice.contains(" ") || choice.equals("")){
 	                System.out.println("Sorry incorrect input, please try again!");
 	                System.out.print("Your choice: ");
 	        	   choice="";

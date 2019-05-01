@@ -113,7 +113,7 @@ public class UserTableDao implements UserDao {
 				Connection connection = ConnectionFactory.getConnection();
 				Statement statement = connection.createStatement();
 				) { 
-			String sql = "INSERT INTO public.users( id, firstname, lastname, username, password, authtype) VALUES ("+row+", '"+user.firstname+"', '"+user.lastname+"', '"+user.username+"', '"+user.password+"', "+user.authtype+")";
+			String sql = "INSERT INTO public.users( id, firstname, lastname, username, password, authtype) VALUES ("+row+", '"+user.getFirstname()+"', '"+user.getLastname()+"', '"+user.getUsername()+"', '"+user.getPassword()+"', "+user.getAuthtype()+")";
 			statement.executeUpdate(sql);
 			connection.close();
 			return true;
@@ -131,10 +131,9 @@ public class UserTableDao implements UserDao {
 				Statement statement = connection.createStatement();
 				) { 
 			String sql = "UPDATE public.users SET id="+user.getId()+", firstname='"+user.getFirstname()+"', lastname='"+user.getLastname()+"', username='"+user.getUsername()+"', password='"+user.getPassword()+"', authtype='"+user.getAuthtype()+"' WHERE id="+user.getId();
-
-			ResultSet resSet = statement.executeQuery(sql);
-			boolean returned = resSet.next();
-			if(returned) {
+			int response = 0;
+			response = statement.executeUpdate(sql);
+			if(response != 0) {
 				connection.close();
 				return true;
 			}else {
@@ -148,7 +147,6 @@ public class UserTableDao implements UserDao {
 			return false;
 		}
 	}
-
 
 	public boolean authUser(String username, String password) {
 		try (
@@ -179,11 +177,17 @@ public class UserTableDao implements UserDao {
 				Connection connection = ConnectionFactory.getConnection();
 				Statement statement = connection.createStatement();
 				) { 
-			ResultSet resSet = statement.executeQuery("SELECT COUNT(*) AS rowcount FROM users");
-			resSet.next();
-			int count = resSet.getInt("rowcount");
+			ResultSet resSet = statement.executeQuery("SELECT id FROM users WHERE id=(SELECT max(id) FROM users)");
+			int count = 0;
+			if(resSet.next()) {
+				count = resSet.getInt("id");
+			}
 			connection.close();
-			return count;
+			if(count == 0) {
+				return -1;
+			}else {
+				return count;
+			}
 
 		} catch (SQLException ex) {
 			System.out.println("DB did not work!");
@@ -236,7 +240,6 @@ public class UserTableDao implements UserDao {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 
 	public void printOneUser(int id) {
 		try (
