@@ -74,8 +74,9 @@ public class Login {
 		System.out.print("Please enter your password: ");
 		String password = ensureScannerString(input);
 		System.out.println("Checking Credentials!!!!");
+		System.out.println();
 		UserTableDao utd = new UserTableDao();
-		boolean exists = utd.getIfUserExists(username, password);//PINNED
+		boolean exists = utd.getIfUserExists(username, password);
 		if(exists) {
 			Users currentUser = returnLoggedInUser(username,password);
 			System.out.println("====================");
@@ -110,7 +111,7 @@ public class Login {
 				System.out.println("Press 1 to see current bank accounts.");
 				System.out.println("Press 2 to create a new bank account.");
 				System.out.println("Press 3 to access an account.");
-				System.out.print("Please pick option: ");
+				//System.out.print("Please pick option: ");
 				int option = ensureScannerInt(input, 4, 0);
 				if(option == 1) {
 					System.out.println("These are your accounts.");
@@ -120,30 +121,38 @@ public class Login {
 						System.out.println(accounts.get(i).getId()+"\t"+accounts.get(i).getType()+"\t"+accounts.get(i).getBalance()+"\t"+accounts.get(i).getAccountstatus());
 						i++;
 					}
+					System.out.println();
 
 				}else if(option == 2) {
+					int numOfPendAccounts = this.numOfPending(currentUser);
+					if(numOfPendAccounts >= 2) {
+						System.out.println("Sorry you already have 2 or more accounts pending please wait until they are processed, Thank you!");
+						System.out.println();
+					}else {
+						
+					
 					System.out.println("What kind of account would you like to apply for?");
 					System.out.println("Press 0 to go back.");
 					System.out.println("Press 1 to create a new Checkings account.");
 					System.out.println("Press 2 to create a new Joint account.");
-					System.out.print("Please pick an option, ");
+					//System.out.print("Please pick an option, ");
 					option = ensureScannerInt(input, 3, 0);
 					if(option == 0) {
 						System.out.println("Going back!");
-					}else if(option == 1) {
+					}else if(option == 1) {	
 						saveNewBankAccount(currentUser, row, "Checking", 0, 2);	
 						System.out.println("Applied for new Checkings Account.");
-						System.out.println("Account created pending approval!........");
 						row++;
 						System.out.println("\n");
 					}else if(option == 2) {
-						System.out.println("Applied for new Joint Account.");
 						saveNewBankAccount(currentUser, row, "Joint", 0, 2);
+						System.out.println("Applied for new Joint Account.");
+						System.out.println();
 						row++;
-					}	
+					}
+					}
 				}else if(option == 3) {
 					System.out.println("Please enter id of account you wish to access");
-					//System.out.print("Your choice: ");
 					int choice = ensureScannerInt(input, bankRowCounts,1);
 					int i = 0;
 					int pick = 0;
@@ -151,8 +160,6 @@ public class Login {
 					JointAccount joiaccount = null;
 
 					while(i<accounts.size()){
-						//System.out.println("Choice Was:"+choice);
-						//System.out.println("Id rn is: "+accounts.get(i).getId());
 						if(accounts.get(i).getId() == choice) {
 							if(accounts.get(i).getType().equals("Checking") && accounts.get(i).getAccountstatus() == 1) {
 								ckaccount = new CheckingAccount(accounts.get(i).getId(), accounts.get(i).getBalance(),accounts.get(i).getType(),accounts.get(i).getAccountstatus());
@@ -169,6 +176,7 @@ public class Login {
 						System.out.println("==============");
 						System.out.println("Invalid choice for bank account.....");
 						System.out.println("==============");
+						System.out.println();
 					}else if(pick == 1) {
 						//System.out.println(ckaccount.getType());
 						singleAccountOptions(currentUser, ckaccount, row);
@@ -296,6 +304,20 @@ public class Login {
 	public ArrayList<BankAccount> returnBankAccounts(Users currentUser) {
 		BankTableDao btd = new BankTableDao();
 		return btd.getUserBankAccounts(currentUser);
+	}
+	
+	private int numOfPending(Users currentUser) {
+		BankTableDao btd = new BankTableDao();
+		ArrayList<BankAccount> accounts = btd.getUserBankAccounts(currentUser);
+		int count =0;
+		int i=0;
+		while(i<accounts.size()) {
+			if(accounts.get(i).getAccountstatus() == 2) {
+				count++;
+			}
+			i++;
+		}
+		return count;
 	}
 	
 	public static int ensureScannerInt(Scanner input, int max, int min) {

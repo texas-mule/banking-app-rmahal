@@ -13,10 +13,10 @@ public class JoinTableDao implements JoinDao{
 			Statement statement = connection.createStatement();
 		) { 
 			int id = currentUser.getId();
-			System.out.println("UserID: "+id+" RowID: "+row);
+			//System.out.println("UserID: "+id+" RowID: "+row);
 			String sql = "INSERT INTO public.joinusersbank (userid, bankaccountid) VALUES ("+id+","+row+")";
 			int resSet = statement.executeUpdate(sql);
-			System.out.println(resSet);
+			//System.out.println(resSet);
 			connection.close();
 			return true;
 			} catch (SQLException ex) {

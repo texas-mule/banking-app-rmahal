@@ -104,7 +104,7 @@ public class BankTableDao implements BankDao{
 			connection.close();
 			return count;
 		} catch (SQLException ex) {
-			System.out.println("DB did not work!");
+			System.out.println("DB did not work in returning returning row count!");
 			System.out.println(ex.getMessage());
 			return 0;
 		}

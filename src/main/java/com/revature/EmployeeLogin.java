@@ -31,17 +31,21 @@ public class EmployeeLogin {
 				System.out.println("All Users:");
 				this.viewAllUserAccounts();
 				System.out.println("==============");
+				System.out.println();
 			}else if(choice == 2) {
 				System.out.println("All Bank Accounts:");
 				this.viewAllBankAccounts();
 				System.out.println("==============");
+				System.out.println();
 			}else if(choice == 3) {
 				System.out.println("All Pending Bank Accounts:");
 				this.viewAllPendingBankAccounts();
 				System.out.println("==============");
+				System.out.println();
 			}else{
 				this.editBankAccountStatus();
 				System.out.println("==============");
+				System.out.println();
 			}
 		}
 

@@ -90,7 +90,6 @@ public class AdminLogin {
 		String lname = ensureScannerString(input);
 		System.out.print("Please enter the Username for this user: ");
 		String username = ensureScannerString(input);
-		System.out.println(username);
 		System.out.print("Please enter the password  for this user: ");
 		String password = ensureScannerString(input);
 		System.out.print("Please enter the authtype for this user: ");
