@@ -62,6 +62,7 @@ public class CheckingAccount extends BankAccount implements Withdrawable, Deposi
 	public void checkBalance() {
 		DecimalFormat df = new DecimalFormat("0.00");
 		System.out.println("Your balance is: $"+df.format(this.balance));
+		System.out.println();
 	}
 
 
@@ -72,10 +73,14 @@ public class CheckingAccount extends BankAccount implements Withdrawable, Deposi
 			saveTranstion();
 		}else if(amount < 0){
 			System.out.println("You tried to take out a negative value, please try again.");
+			System.out.println();
 		}else{
 			System.out.println("Attempted to take out more than you have plese try again.");
+			System.out.println();
 		}
-		System.out.println("Your current balance is $"+this.balance);
+		DecimalFormat df = new DecimalFormat("0.00");
+		System.out.println("Your current balance is $"+df.format(this.balance));
+		System.out.println();
 	}
 
 	//Method to deposit money from their bank account
@@ -83,9 +88,12 @@ public class CheckingAccount extends BankAccount implements Withdrawable, Deposi
 		if(amount > 0) {
 			this.balance = this.balance+amount;
 			saveTranstion();
-			System.out.println("Your current balance is $"+this.balance);
+			DecimalFormat df = new DecimalFormat("0.00");
+			System.out.println("Your current balance is $"+df.format(this.balance));
+			System.out.println();
 		}else {
 			System.out.println("Invalid amount being deposited please try again later!");
+			System.out.println();
 		}
 	}
 
@@ -118,9 +126,12 @@ public class CheckingAccount extends BankAccount implements Withdrawable, Deposi
 		BankTableDao btd = new BankTableDao();
 		boolean success = btd.TransferBetweenAccounts(accounts, amount);
 		if(success) {
-			System.out.println("Transfering funds from account #"+accounts.get(0).getId()+" to account #"+accounts.get(1)+" was completed." );
+			DecimalFormat df = new DecimalFormat("0.00");
+			System.out.println("Transfering $"+df.format(amount)+" from account #"+accounts.get(0).getId()+" to account #"+accounts.get(1).getId()+" was completed." );
+			System.out.println();
 		}else {
 			System.out.println("There was an error trying to transfer please try again later!");
+			System.out.println();
 		}
 	}
 

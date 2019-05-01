@@ -23,7 +23,6 @@ public class EmployeeLogin {
 			System.out.println("Press 2 to see all bank accounts.");
 			System.out.println("Press 3 to see all pending bank accounts.");
 			System.out.println("Press 4 change status of bank accounts.");
-			System.out.print("Please pick option: ");
 			int choice = ensureScannerInt(input, 5, 0);
 			if(choice == 0) {
 				run=false;

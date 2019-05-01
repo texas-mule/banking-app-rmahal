@@ -1,5 +1,6 @@
 package com.revature;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -22,8 +23,11 @@ public class AdminLogin {
 			System.out.println("Press 0 to log out....");
 			System.out.println("Press 1 to interact with users and their accounts...");
 			System.out.println("Press 2 to interact with bank accounts...");
+			System.out.println();
 			int choice = ensureScannerInt(input, 3, 0);
+			System.out.println();
 			if(choice == 0) {
+				System.out.println();
 				run = false;
 				break;
 			}else if(choice == 1) {
@@ -47,21 +51,27 @@ public class AdminLogin {
 			System.out.println("Press 0 to go back.");
 			System.out.println("Press 1 to see all user accounts.");
 			System.out.println("Press 2 to edit a user accounts.");
-			//System.out.print("Please pick option: ");
+			System.out.print("");
 			int choice = ensureScannerInt(input, 3, 0);
+			System.out.print("");
 			if(choice == 0) {
+				System.out.println();
 				run=false;
 				break;
 			}else if(choice == 1) {
+				System.out.println();
 				System.out.println("All Users:");
 				this.viewAllUserAccounts();
 				System.out.println("===========================");
+				System.out.println();
 			}else if(choice == 2) {
 				System.out.println("All Bank Accounts:");
 				this.editUserAccount();
 				System.out.println("==============");
+				System.out.println();
 			}else{
 				System.out.println("==============");
+				System.out.println();
 			}
 		}
 
@@ -93,26 +103,19 @@ public class AdminLogin {
 		System.out.print("Please enter the password  for this user: ");
 		String password = ensureScannerString(input);
 		System.out.print("Please enter the authtype for this user: ");
+		System.out.print("");
 		int auth = ensureScannerInt(input, 4, 1);
-		
+		System.out.print("");
 		Users user = new Users(choice,fname,lname,username,password,auth);
 		boolean success = utd.updateUser(user);
 		if(success) {
 			System.out.println("Successfully updated user.");
+			System.out.println();
 		}else {
 			System.out.println("A problem occured please try again later.");
+			System.out.println();
 		}
 	}
-	
-//	private void pushUpdatedUserToDAO(UserTableDao utd,int row, String fname, String lname, String username, String password, int authtype) {
-//		Users user = new Users(row, fname, lname,username, password, authtype);
-//		boolean success = utd.insertUser(row, user);
-//		if(success) {
-//			System.out.println("User successfully added!");
-//		}else {
-//			System.out.println("Error in adding user, please !");
-//		}
-//	}
 
 	private void viewAllBankAccounts(Users currentUser) {
 		boolean run = true;
@@ -124,6 +127,7 @@ public class AdminLogin {
 			System.out.println("Press 2 to access and edit a bank account.");
 			System.out.println("Press 3 to change status of account.");
 			System.out.println("Press 4 cancel an account.");
+			System.out.println();
 			int choice = ensureScannerInt(input, 5, 0);
 			if(choice == 0) {
 				run=false;
@@ -132,20 +136,25 @@ public class AdminLogin {
 				System.out.println("All Accounts:");
 				this.viewAllAccounts();
 				System.out.println("==============");
+				System.out.println();
 			}else if(choice == 2) {
 				int bankRowCounts = this.returnBankAccountRowCount();
 				this.accessBankAccount(input, bankRowCounts);
 				System.out.println("==============");
+				System.out.println();
 			}else if(choice == 3) {
 				System.out.println("Change the status:");
 				this.editBankStatus();
 				System.out.println("==============");
+				System.out.println();
 			}else if(choice == 4) {
 				System.out.println("Cancel account:");
 				this.cancelBankAccount();
 				System.out.println("==============");
+				System.out.println();
 			}else{
 				System.out.println("==============");
+				System.out.println();
 			}
 		}
 	}
@@ -202,32 +211,32 @@ public class AdminLogin {
 			}
 		}
 	}
-	
-	
+
+
 	public static String ensureScannerString(Scanner input) {
 		String choice = ""; 
 		while(choice.equals("") || choice.equals(null)) {
-            try {         
- 	           choice = input.nextLine();
-	           if(choice.contains(";") || choice.contains("*") || choice.equals("\n") || choice.contains(" ") || choice.equals("")){
-	                System.out.println("Sorry incorrect input, please try again!");
-	                System.out.print("Your choice: ");
-	        	   choice="";
-	           }
-            }catch(Exception e) {
-                input.next();
-                System.out.println("Sorry improper input...");
-                choice="";
-            }
-        }
+			try {         
+				choice = input.nextLine();
+				if(choice.contains(";") || choice.contains("*") || choice.equals("\n") || choice.contains(" ")){
+					System.out.println("Sorry incorrect input, please try again!");
+					System.out.print("Your choice: ");
+					choice="";
+				}
+			}catch(Exception e) {
+				input.next();
+				System.out.println("Sorry improper input...");
+				choice="";
+			}
+		}
 		return choice;
 	}
 
 	private void accessBankAccount(Scanner input, int bankRowCounts) {
+		System.out.println();
 		System.out.println("Please enter id of account you wish to access");
-		System.out.print("Your choice: ");
 		int choice = ensureScannerInt(input, bankRowCounts+1,1);
-
+		System.out.println();
 		ArrayList<BankAccount> bankaccount = new ArrayList<BankAccount>();
 		BankTableDao btd = new BankTableDao();
 		bankaccount.add(btd.getAccount(choice));
@@ -264,10 +273,11 @@ public class AdminLogin {
 		ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 		accounts = returnAllBankAccounts();
 		Scanner input = new Scanner(System.in);
-
+		DecimalFormat df = new DecimalFormat("0.00");
 		int i=0;
+		System.out.println("ID\tTYPE\t\tBALANCE\t\tSTATUS");
 		while(i<accounts.size()) {
-			System.out.println(accounts.get(i).getId()+"\t"+accounts.get(i).getBalance()+"\t"+accounts.get(i).getType()+"\t"+accounts.get(i).getAccountstatus());
+			System.out.println(accounts.get(i).getId()+"\t$"+df.format(accounts.get(i).getBalance())+"\t\t"+accounts.get(i).getType()+"\t"+accounts.get(i).getAccountstatus());
 			i++;
 		}
 		boolean run = true;
@@ -275,6 +285,7 @@ public class AdminLogin {
 		JointAccount ja = null;
 		while(run) {
 			accounts = returnAllBankAccounts();
+			System.out.println();
 			System.out.println("Select account to update by their id... press 0 to back out");
 			int max =returnBankAccountRowCount();
 			int choice = ensureScannerInt(input, max+1, 0);
@@ -302,6 +313,7 @@ public class AdminLogin {
 					System.out.println("Select 1 to approve account.");
 					System.out.println("Select 2 to put account on pending.");
 					System.out.println("Select 3 to deny account.");
+					System.out.println();
 					int status = ensureScannerInt(input, 4, 1);
 					if(status == 1) {
 						if(ca != null) {
@@ -357,15 +369,20 @@ public class AdminLogin {
 				int choice = ensureScannerInt(input, 4, 0);
 				if(choice == 1) {
 					System.out.println("How much would you like to withdraw?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
+					System.out.println();
 					account.Withdraw(amount);
+					System.out.println();
 				}else if(choice == 2) {
 					System.out.println("How much would you like to deposit?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					System.out.println();
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
+					System.out.println();
 					account.Deposit(amount);
+					System.out.println();
 				}else if(choice == 3) {
 					System.out.println("How much would you like to transfer?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
 					System.out.println("Where would you like to transfer it too?");
 					int where = ensureScannerInt(input, row+1, 1);
 					if(where == account.getId()) {
@@ -387,29 +404,37 @@ public class AdminLogin {
 				System.out.println("Press 2 to Deposit...");
 				System.out.println("Press 3 to Transfer...");
 				System.out.println("Press 4 to add another user to the account...");
+				System.out.println();
 				int choice = ensureScannerInt(input, 5, 0);
+				System.out.println();
 				if(choice == 1) {
 					System.out.println("How much would you like to withdraw?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
 					account.Withdraw(amount);
+					System.out.println();
 				}else if(choice == 2) {
 					System.out.println("How much would you like to deposit?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
 					account.Deposit(amount);
+					System.out.println();
 				}else if(choice == 3) {
 					System.out.println("How much would you like to transfer?");
-					int amount = ensureBalanceScannerInt(input, 1000000, 0);
+					double amount = ensureBalanceScannerDoub(input, 1000000, 0);
 					System.out.println("Where would you like to transfer it too?");
 					int where = ensureScannerInt(input, row+1, 1);
+					System.out.println();
 					account.Transfer(where, amount);
+					System.out.println();
 				}else if(choice == 4) {
 					System.out.println("Please enter id of person you wish to add to the account!");
 					int where = ensureScannerInt(input, row+1, 1);
 					boolean response = account.addUserToAccount(currentUser, where);
 					if(response) {
 						System.out.println("Successful in adding user!");
+						System.out.println();
 					}else {
 						System.out.println("Successful in adding user!");
+						System.out.println();
 					}
 				}else {
 					run = false;
@@ -429,7 +454,7 @@ public class AdminLogin {
 		int choice = -1 ; 
 		int choiceMax = max-1;
 		while(choice==-1) {
-			try {         
+			try {
 				System.out.print("Your choice: ");
 				choice = input.nextInt();
 				if(choice>choiceMax || choice<min){
@@ -439,19 +464,18 @@ public class AdminLogin {
 			}catch(Exception e) {
 				input.next();
 				System.out.println("Invalid input please try again,");
-				System.out.print("Your choice: ");
 				choice=-1;
 			}
 		}
 		return choice;
 	}
 
-	public static int ensureBalanceScannerInt(Scanner input, int max, int min) {
-		int choice = -1;
+	public static double ensureBalanceScannerDoub(Scanner input, int max, int min) {
+		double choice = -1;
 		while(choice==-1) {
 			try {         
-				System.out.print("Your choice: ");
-				choice = input.nextInt();
+				System.out.print("Your choice: $");
+				choice = input.nextDouble();
 				if(choice<min){
 					System.out.println("Input too low try again...");
 					choice=-1;

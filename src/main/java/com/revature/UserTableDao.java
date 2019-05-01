@@ -224,7 +224,7 @@ public class UserTableDao implements UserDao {
 				) { 
 			String sql = "SELECT * FROM public.users";
 			ResultSet resSet = statement.executeQuery(sql);
-			System.out.println("ID\tFirstName\tLastName\t\tUsername\tPasswords\tAuthType");
+			System.out.println("ID\tFirstName\t\tLastName\tUsername\tPasswords\tAuthType");
 			while(resSet.next()) {
 					System.out.println(resSet.getInt("id")+"\t"+resSet.getString("firstname")+"\t\t\t"+resSet.getString("lastname")+"\t\t"+resSet.getString("username")+"\t\t"+resSet.getString("password")+"\t\t"+resSet.getString("authtype"));
 			}

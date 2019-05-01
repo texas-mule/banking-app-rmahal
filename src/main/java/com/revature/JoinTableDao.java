@@ -15,6 +15,7 @@ public class JoinTableDao implements JoinDao{
 			int id = currentUser.getId();
 			//System.out.println("UserID: "+id+" RowID: "+row);
 			String sql = "INSERT INTO public.joinusersbank (userid, bankaccountid) VALUES ("+id+","+row+")";
+			@SuppressWarnings("unused")
 			int resSet = statement.executeUpdate(sql);
 			//System.out.println(resSet);
 			connection.close();

@@ -78,7 +78,7 @@ public class JointAccount extends BankAccount implements Withdrawable, Depositab
 		}
 		DecimalFormat df = new DecimalFormat("0.00");
 		System.out.println("Your current balance is $"+df.format(this.balance));
-
+		System.out.println();
 	}
 
 	//Method to deposit money from their bank account
